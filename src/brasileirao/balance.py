@@ -86,16 +86,24 @@ def noll_scully(matches: pd.DataFrame, league: str, season: int,
     actual_sd = float(np.std(_final_points(matches), ddof=0))
     rates = matches["outcome"].value_counts(normalize=True).reindex(
         ["H", "D", "A"], fill_value=0.0).to_numpy()
-    fixtures = matches[["home_team", "away_team", "date"]].reset_index(drop=True)
-    sds = []
-    for _ in range(n_boot):
-        drawn = rng.choice(["H", "D", "A"], size=len(fixtures), p=rates)
-        sim = fixtures.copy()
-        sim["outcome"] = drawn
-        sim["home_goals"] = (drawn == "H").astype(int)
-        sim["away_goals"] = (drawn == "A").astype(int)
-        sds.append(np.std(_final_points(sim), ddof=0))
-    ideal_sd = float(np.mean(sds))
+
+    # Vectorized simulation: draw H/D/A codes (0/1/2) for the exact fixture
+    # list and accumulate points per team with bincount - identical statistic
+    # to replaying final_table, without rebuilding a DataFrame each draw (the
+    # notebook runs this thousands of times across leagues x seasons).
+    teams = pd.Index(sorted(set(matches["home_team"]) | set(matches["away_team"])))
+    home_idx = teams.get_indexer(matches["home_team"])
+    away_idx = teams.get_indexer(matches["away_team"])
+    n_teams, n_matches = len(teams), len(matches)
+    home_pts = np.array([3, 1, 0])   # points for a [H, D, A] result
+    away_pts = np.array([0, 1, 3])
+    sds = np.empty(n_boot)
+    for b in range(n_boot):
+        codes = rng.choice(3, size=n_matches, p=rates)
+        pts = (np.bincount(home_idx, weights=home_pts[codes], minlength=n_teams)
+               + np.bincount(away_idx, weights=away_pts[codes], minlength=n_teams))
+        sds[b] = pts.std(ddof=0)
+    ideal_sd = float(sds.mean())
     return actual_sd / ideal_sd if ideal_sd > 0 else np.nan
 
 

@@ -102,9 +102,26 @@ def _normalize_extra(raw: pd.DataFrame, league: str) -> pd.DataFrame:
     return _finish(df, league)
 
 
+def _is_corrupt(head: bytes) -> bool:
+    """A football-data CSV starts with a UTF-8 BOM or a column name ('Div',
+    'Country', ...), never NUL bytes. Guards against a partially-written /
+    cached-garbage file that `_download` would otherwise never retry (observed:
+    an interrupted fetch left a NUL-filled E0.csv that broke every later run)."""
+    return len(head) == 0 or head[:1] == b"\x00"
+
+
 def _download(url: str, path) -> None:
-    if not path.exists():
-        urllib.request.urlretrieve(url, path)
+    if path.exists():
+        return
+    urllib.request.urlretrieve(url, path)
+    with open(path, "rb") as fh:
+        head = fh.read(16)
+    if _is_corrupt(head):
+        path.unlink()
+        raise ValueError(
+            f"Downloaded {url} looks corrupt (empty/NUL-filled); deleted "
+            f"{path.name} so a re-run retries the fetch."
+        )
 
 
 def load_main_league(league: str, code: str, seasons) -> pd.DataFrame:

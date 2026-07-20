@@ -64,3 +64,10 @@ def test_implied_probabilities_devigs_to_one():
 def test_season_code_format():
     assert leagues._season_code(2012) == "1213"
     assert leagues._season_code(1999) == "9900"
+
+
+def test_is_corrupt_detects_nul_and_empty():
+    assert leagues._is_corrupt(b"")
+    assert leagues._is_corrupt(b"\x00\x00\x00")
+    assert not leagues._is_corrupt(b"\xef\xbb\xbfDiv,Date")  # UTF-8 BOM header
+    assert not leagues._is_corrupt(b"Country,League,Season")

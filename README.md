@@ -320,10 +320,12 @@ This is Chapter A of a planned three-chapter anthology; the full design
 lives in
 [`docs/superpowers/specs/2026-07-19-brasileirao-home-advantage-design.md`](docs/superpowers/specs/2026-07-19-brasileirao-home-advantage-design.md).
 
-- **Chapter B — cross-league unpredictability.** How competitively balanced
-  is the Brasileirão compared with the Premier League and La Liga —
-  measured through outcome entropy, model calibration, and title-race /
-  relegation-race volatility, not just home advantage?
+- **[Chapter B — cross-league unpredictability](docs/chapter-b-unpredictability.md).**
+  How competitively balanced is the Brasileirão compared with Europe's big
+  five — measured through outcome entropy, underdog points share, model and
+  market calibration, Noll–Scully standings spread, and title-race /
+  relegation-race volatility, not just home advantage? *(Verdict: the most
+  unpredictable of the six at both the match and the season level.)*
 - **Chapter C — the mid-season exodus.** Brazil's transfer windows don't
   align with Europe's; star players are routinely sold to European clubs
   mid-season. Does that misalignment show up as a measurable performance

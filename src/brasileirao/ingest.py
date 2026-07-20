@@ -12,6 +12,7 @@ MATCHES_URL = (
 )
 RAW_FILE = RAW / "campeonato-brasileiro-full.csv"
 PROCESSED_FILE = PROCESSED / "matches.parquet"
+FIRST_SEASON = 2003  # Serie A adopted the round-robin format in 2003
 
 # raw (lowercased) column -> canonical name. If the upstream schema drifts,
 # clean() raises listing what it actually found - fix the mapping here only.
@@ -57,6 +58,11 @@ def clean(raw: pd.DataFrame) -> pd.DataFrame:
 
     df["season"] = df["date"].dt.year.where(df["date"].dt.month > 3,
                                             df["date"].dt.year - 1)
+    # The Jan-Mar rollback above correctly folds a season's overflow into
+    # the previous year (e.g. Feb 2021 -> season 2020), but it also rolls
+    # the March 2003 round-robin opener back to 2002 - a season that
+    # doesn't exist in this dataset. Clamp to the first real season.
+    df["season"] = df["season"].clip(lower=FIRST_SEASON)
     df["outcome"] = "D"
     df.loc[df["home_goals"] > df["away_goals"], "outcome"] = "H"
     df.loc[df["home_goals"] < df["away_goals"], "outcome"] = "A"
@@ -69,7 +75,7 @@ def clean(raw: pd.DataFrame) -> pd.DataFrame:
 def build(force: bool = False) -> pd.DataFrame:
     raw = pd.read_csv(download_raw(force=force))
     df = clean(raw)
-    df = df[df["season"] >= 2003].reset_index(drop=True)
+    df = df[df["season"] >= FIRST_SEASON].reset_index(drop=True)
     df.to_parquet(PROCESSED_FILE, index=False)
     return df
 

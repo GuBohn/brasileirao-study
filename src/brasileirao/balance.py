@@ -62,3 +62,87 @@ def forecastability(matches: pd.DataFrame, first_test_season: int) -> dict:
         market_ll = np.nan
     return {"model_ll": float(model_ll), "floor_ll": float(floor_ll),
             "market_ll": float(market_ll), "n_odds": int(have_odds.sum())}
+
+
+from . import standings  # noqa: E402  (grouped with season-level section)
+
+# ---- Season level ----------------------------------------------------------
+
+
+def _final_points(matches: pd.DataFrame) -> np.ndarray:
+    return standings.final_table(matches)["points"].to_numpy()
+
+
+def noll_scully(matches: pd.DataFrame, league: str, season: int,
+                n_boot: int = 1000, seed: int = 0) -> float:
+    """Actual SD of final points divided by an idealized 'balanced-league' SD
+    estimated by simulation: replay the exact fixture list with every outcome
+    redrawn from this season's own H/D/A base rates (identical-strength teams),
+    take the mean SD of final points across `n_boot` simulated seasons. A ratio
+    near 1 means the table is about as spread as pure chance; higher means real
+    strength gaps. Simulation makes the null self-consistent with draws / 3-1-0
+    and normalizes away the 34-vs-38-game team-count difference."""
+    rng = np.random.default_rng(seed)
+    actual_sd = float(np.std(_final_points(matches), ddof=0))
+    rates = matches["outcome"].value_counts(normalize=True).reindex(
+        ["H", "D", "A"], fill_value=0.0).to_numpy()
+    fixtures = matches[["home_team", "away_team", "date"]].reset_index(drop=True)
+    sds = []
+    for _ in range(n_boot):
+        drawn = rng.choice(["H", "D", "A"], size=len(fixtures), p=rates)
+        sim = fixtures.copy()
+        sim["outcome"] = drawn
+        sim["home_goals"] = (drawn == "H").astype(int)
+        sim["away_goals"] = (drawn == "A").astype(int)
+        sds.append(np.std(_final_points(sim), ddof=0))
+    ideal_sd = float(np.mean(sds))
+    return actual_sd / ideal_sd if ideal_sd > 0 else np.nan
+
+
+def title_hhi(champions: list[str]) -> float:
+    """Herfindahl index of championship shares over the window."""
+    s = pd.Series(champions).value_counts(normalize=True)
+    return float((s ** 2).sum())
+
+
+def _secured_index(matches: pd.DataFrame, n_teams: int, condition) -> int:
+    """Index (1-based match count) at which `condition(points, remaining)` first
+    holds, walking matches in date order. total_rounds = 2*(n_teams-1)."""
+    total_rounds = 2 * (n_teams - 1)
+    trace = standings.cumulative_points(matches, n_teams, total_rounds)
+    for i, state in enumerate(trace, start=1):
+        if condition(state["points"], state["remaining"]):
+            return i
+    return len(trace)
+
+
+def title_decidedness(matches: pd.DataFrame, n_teams: int) -> float:
+    """Share of the season's matches still unplayed when the champion became
+    mathematically secured (0 = decided on the last match, higher = earlier).
+    Title secured when the leader's current points exceed every rival's maximum
+    possible final points (P_j + 3 * remaining_j)."""
+    def secured(points, remaining):
+        order = sorted(points, key=points.get, reverse=True)
+        leader = order[0]
+        return all(points[leader] > points[j] + 3 * remaining[j]
+                   for j in order[1:])
+    idx = _secured_index(matches, n_teams, secured)
+    total = len(matches)
+    return (total - idx) / total
+
+
+def relegation_decidedness(matches: pd.DataFrame, n_teams: int, k: int) -> float:
+    """Share of matches unplayed when exactly `k` teams are mathematically
+    relegated (each can no longer climb above the k-th-from-bottom safe line)."""
+    def secured(points, remaining):
+        max_final = {t: points[t] + 3 * remaining[t] for t in points}
+        relegated = 0
+        for t in points:
+            # t is doomed if at least (n_teams - k) teams already exceed t's max.
+            better = sum(points[o] > max_final[t] for o in points if o != t)
+            if better >= n_teams - k:
+                relegated += 1
+        return relegated >= k
+    idx = _secured_index(matches, n_teams, secured)
+    total = len(matches)
+    return (total - idx) / total

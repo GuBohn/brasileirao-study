@@ -59,3 +59,47 @@ def test_forecastability_model_beats_floor_on_signal():
     assert np.isfinite(res["model_ll"]) and np.isfinite(res["floor_ll"])
     assert res["model_ll"] < res["floor_ll"]
     assert np.isnan(res["market_ll"])  # no odds in the synthetic league
+
+
+# --- season-level metrics ---
+from brasileirao import standings
+
+
+def _full_schedule(n_teams, seed, base_rates=(0.45, 0.27, 0.28)):
+    """Double round-robin; outcomes drawn from fixed base rates => a
+    perfectly balanced league (Noll-Scully should be ~1)."""
+    rng = np.random.default_rng(seed)
+    teams = [f"T{i}" for i in range(n_teams)]
+    base = pd.Timestamp("2015-01-01")
+    rows, day = [], 0
+    for h in teams:
+        for a in teams:
+            if h == a:
+                continue
+            o = rng.choice(["H", "D", "A"], p=base_rates)
+            hg, ag = {"H": (1, 0), "D": (0, 0), "A": (0, 1)}[o]
+            rows.append({"league": "T", "season": 2015,
+                         "date": base + pd.Timedelta(days=day), "home_team": h,
+                         "away_team": a, "home_goals": hg, "away_goals": ag,
+                         "outcome": o})
+            day += 1
+    return pd.DataFrame(rows)
+
+
+def test_noll_scully_of_balanced_league_near_one():
+    df = _full_schedule(n_teams=16, seed=3)
+    ns = balance.noll_scully(df, league="T", season=2015, n_boot=400)
+    assert 0.7 < ns < 1.4  # stochastic; a balanced league sits around 1
+
+
+def test_title_hhi_extremes():
+    assert np.isclose(balance.title_hhi(["A", "A", "A"]), 1.0)
+    assert np.isclose(balance.title_hhi(["A", "B", "C", "D"]), 0.25)
+
+
+def test_title_decidedness_last_day_is_zero_ish():
+    # Construct a season decided only on the final match: two teams neck and
+    # neck, leader clinches with the last game.
+    df = _full_schedule(n_teams=4, seed=7)
+    dec = balance.title_decidedness(df, n_teams=4)
+    assert 0.0 <= dec <= 1.0

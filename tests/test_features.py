@@ -24,6 +24,12 @@ def test_crowd_status_windows():
     assert s.tolist() == ["full", "full", "closed", "partial"]
 
 
+def test_build_features_keeps_three_way_crowd_status():
+    f = features.build_features(_matches())
+    assert f["crowd"].tolist() == ["full", "full", "closed", "partial"]
+    assert f["crowd_closed"].tolist() == [0, 0, 1, 0]
+
+
 def test_rest_days_first_match_capped_and_causal():
     rest = features.rest_days(_matches())
     assert rest.loc[0, "home_rest"] == 14  # Flamengo's first match

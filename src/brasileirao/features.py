@@ -65,8 +65,10 @@ def build_features(matches: pd.DataFrame) -> pd.DataFrame:
     df["temp_gap"] = temp_gap(df)
     rest = rest_days(df)
     df["rest_diff"] = rest["home_rest"] - rest["away_rest"]
-    crowd = crowd_status(df["date"])
-    df["crowd_closed"] = (crowd == "closed").astype(int)
+    # Keep the three-way status, not just the closed flag: the crowd analysis
+    # must exclude the partial-attendance window rather than lump it with full.
+    df["crowd"] = crowd_status(df["date"])
+    df["crowd_closed"] = (df["crowd"] == "closed").astype(int)
     df["same_state"] = (df["home_state"] == df["away_state"]).astype(int)
     df["y"] = df["outcome"].map(TARGET)
     return df

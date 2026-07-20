@@ -1,0 +1,29 @@
+[project]
+name = "brasileirao"
+version = "0.1.0"
+description = "Brasileirao home advantage study"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.2",
+    "pyarrow>=16",
+    "numpy>=1.26",
+    "lightgbm>=4.3",
+    "shap>=0.45",
+    "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+    "jupyter>=1.0",
+    "nbconvert>=7.16",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

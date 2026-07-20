@@ -34,3 +34,32 @@ def test_evaluate_returns_finite_and_deterministic():
     assert np.isfinite(a["log_loss"]).all()
     pd.testing.assert_frame_equal(a, b)
     assert a["log_loss"].mean() < 1.2
+
+
+def test_class_prior_baseline_matches_training_frequencies():
+    df = _synthetic()
+    result = model.class_prior_baseline(df, first_test_season=2012)
+    assert np.isfinite(result["log_loss"]).all()
+
+    # First fold by hand: predicting the 2010-2011 class frequencies for
+    # every 2012 row should reproduce exactly the log loss the function
+    # reports for season 2012.
+    train = df[df.season < 2012]
+    test = df[df.season == 2012]
+    freq = train["y"].value_counts(normalize=True).reindex([0, 1, 2], fill_value=0.0).to_numpy()
+    from sklearn.metrics import log_loss
+    expected = log_loss(test["y"], np.tile(freq, (len(test), 1)), labels=[0, 1, 2])
+    got = result.loc[result.season == 2012, "log_loss"].iloc[0]
+    assert np.isclose(got, expected)
+
+
+def test_evaluate_beats_class_prior_on_separable_synthetic_signal():
+    # The synthetic data has a real elo_diff -> outcome relationship, so a
+    # correctly regularised model should be able to beat a model with no
+    # features at all. This is the same floor check applied to the real
+    # data in the notebook - a model that fails it is mis-specified.
+    df = _synthetic()
+    feats = ["elo_home_pre", "elo_away_pre", "elo_diff"]
+    fitted = model.evaluate(df, feats, first_test_season=2012)
+    prior = model.class_prior_baseline(df, first_test_season=2012)
+    assert fitted["log_loss"].mean() < prior["log_loss"].mean()

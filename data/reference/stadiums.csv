@@ -1,0 +1,49 @@
+team,city,state,lat,lon,elevation_m,avg_temp_c
+Atletico-MG,Belo Horizonte,MG,-19.92,-43.94,850,21
+America-MG,Belo Horizonte,MG,-19.92,-43.94,850,21
+Cruzeiro,Belo Horizonte,MG,-19.92,-43.94,850,21
+Ipatinga,Ipatinga,MG,-19.47,-42.54,240,23
+Athletico-PR,Curitiba,PR,-25.45,-49.28,935,17
+Coritiba,Curitiba,PR,-25.43,-49.27,935,17
+Parana,Curitiba,PR,-25.43,-49.27,935,17
+Atletico-GO,Goiania,GO,-16.69,-49.26,750,23
+Goias,Goiania,GO,-16.69,-49.26,750,23
+Vila Nova,Goiania,GO,-16.69,-49.26,750,23
+America-RN,Natal,RN,-5.80,-35.21,30,26
+Avai,Florianopolis,SC,-27.60,-48.55,5,21
+Figueirense,Florianopolis,SC,-27.60,-48.55,5,21
+Chapecoense,Chapeco,SC,-27.10,-52.62,670,19
+Criciuma,Criciuma,SC,-28.68,-49.37,45,19
+Joinville,Joinville,SC,-26.30,-48.85,15,21
+Bahia,Salvador,BA,-12.97,-38.50,30,25
+Vitoria,Salvador,BA,-12.97,-38.50,40,25
+Botafogo,Rio de Janeiro,RJ,-22.91,-43.23,5,24
+Flamengo,Rio de Janeiro,RJ,-22.91,-43.23,5,24
+Fluminense,Rio de Janeiro,RJ,-22.91,-43.23,5,24
+Vasco,Rio de Janeiro,RJ,-22.91,-43.23,5,24
+Bragantino,Braganca Paulista,SP,-22.95,-46.54,850,19
+Corinthians,Sao Paulo,SP,-23.55,-46.63,760,20
+Palmeiras,Sao Paulo,SP,-23.55,-46.63,760,20
+Portuguesa,Sao Paulo,SP,-23.55,-46.63,760,20
+Sao Paulo,Sao Paulo,SP,-23.55,-46.63,760,20
+Santos,Santos,SP,-23.95,-46.33,5,22
+Santo Andre,Santo Andre,SP,-23.66,-46.53,760,20
+Sao Caetano,Sao Caetano do Sul,SP,-23.70,-46.56,740,20
+Guarani,Campinas,SP,-22.91,-47.06,690,21
+Ponte Preta,Campinas,SP,-22.91,-47.06,690,21
+Mirassol,Mirassol,SP,-20.82,-49.52,570,24
+Gremio Barueri,Barueri,SP,-23.51,-46.88,720,20
+Gremio Prudente,Presidente Prudente,SP,-22.13,-51.39,470,23
+Brasiliense,Taguatinga,DF,-15.83,-48.06,1100,21
+Ceara,Fortaleza,CE,-3.73,-38.53,20,27
+Fortaleza,Fortaleza,CE,-3.73,-38.53,20,27
+Gremio,Porto Alegre,RS,-30.03,-51.23,10,20
+Internacional,Porto Alegre,RS,-30.03,-51.23,10,20
+Juventude,Caxias do Sul,RS,-29.17,-51.18,800,16
+Nautico,Recife,PE,-8.05,-34.90,30,26
+Santa Cruz,Recife,PE,-8.05,-34.90,20,26
+Sport,Recife,PE,-8.05,-34.90,10,26
+Paysandu,Belem,PA,-1.45,-48.49,10,27
+CSA,Maceio,AL,-9.65,-35.72,10,25
+Cuiaba,Cuiaba,MT,-15.60,-56.10,165,27
+Botafogo-SP,Ribeirao Preto,SP,-21.18,-47.81,530,22

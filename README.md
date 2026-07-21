@@ -326,7 +326,10 @@ lives in
   market calibration, Noll–Scully standings spread, and title-race /
   relegation-race volatility, not just home advantage? *(Verdict: the most
   unpredictable of the six at both the match and the season level.)*
-- **Chapter C — the mid-season exodus.** Brazil's transfer windows don't
-  align with Europe's; star players are routinely sold to European clubs
-  mid-season. Does that misalignment show up as a measurable performance
-  dip for the clubs left behind?
+- **[Chapter C — the mid-season exodus](docs/chapter-c-exodus.md).** Brazil's
+  transfer windows don't align with Europe's; star players are routinely sold to
+  European clubs mid-season. Does that misalignment show up as a measurable
+  performance dip for the clubs left behind — measured by an event study on
+  Elo-residual form around the sale, against a placebo no-effect floor and a
+  difference-in-differences check? *(Verdict: no detectable effect — a small
+  negative dip that does not clear the placebo floor.)*

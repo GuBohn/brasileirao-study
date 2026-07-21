@@ -107,3 +107,16 @@ def event_study(panel: pd.DataFrame, seed: int = 0) -> dict:
     return dict(mean_d_resid=float(treated["d_resid"].mean()),
                 mean_d_ppg=float(treated["d_ppg"].mean()),
                 n=int(len(treated)), ci_resid=(lo, hi))
+
+
+def placebo_floor(panel: pd.DataFrame, n_iter: int = 2000, seed: int = 0) -> dict:
+    """Null band: the treated-mean statistic if 'treatment' were assigned at
+    random to the same number of non-selling club-seasons. The direct analog of
+    Chapter A/B's class-prior floor — the effect must clear this to be a finding."""
+    rng = np.random.default_rng(seed)
+    controls = panel.loc[~panel["treated"], "d_resid"].to_numpy()
+    k = int(panel["treated"].sum())
+    draws = np.array([controls[rng.integers(0, len(controls), k)].mean()
+                      for _ in range(n_iter)])
+    lo, hi = np.quantile(draws, [0.025, 0.975])
+    return dict(mean=float(draws.mean()), lo=float(lo), hi=float(hi), dist=draws)

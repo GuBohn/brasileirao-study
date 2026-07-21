@@ -92,3 +92,15 @@ def test_build_panel_partition_and_dose():
     assert strong["treated"] and strong["n_departures"] == 2
     assert abs(strong["dose_eur"] - 8e6) < 1e-6
     assert (~panel[panel["club"] != "Strong"]["treated"]).all()
+
+
+def test_placebo_uses_only_controls_and_is_reproducible():
+    panel = pd.DataFrame({
+        "treated": [True, True, False, False, False, False],
+        "d_resid": [0.9, 0.9, -1.0, -1.0, -1.0, -1.0],
+    })
+    a = exodus.placebo_floor(panel, n_iter=200, seed=1)
+    b = exodus.placebo_floor(panel, n_iter=200, seed=1)
+    assert a["dist"].tolist() == b["dist"].tolist()
+    assert abs(a["mean"] - (-1.0)) < 1e-9
+    assert a["lo"] <= a["mean"] <= a["hi"]

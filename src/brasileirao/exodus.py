@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-from . import ratings
+from . import analysis, ratings
 
 _OUTCOME_TO_Y = {"H": 0, "D": 1, "A": 2}
 
@@ -73,3 +73,37 @@ def club_season_stat(view: pd.DataFrame) -> dict:
         pre_slope=pre_slope,
         pre_elo=float(pre["club_elo"].mean()),
     )
+
+
+SEASONS = [s for s in range(2012, 2025) if s != 2020]
+
+
+def build_panel(departures: pd.DataFrame, matches_exp: pd.DataFrame,
+                seasons=SEASONS) -> pd.DataFrame:
+    dose = departures.groupby(["club", "season"])["market_value_eur"].sum(min_count=1)
+    n_dep = departures.groupby(["club", "season"]).size()
+    club_seasons = (set(zip(matches_exp["home_team"], matches_exp["season"]))
+                    | set(zip(matches_exp["away_team"], matches_exp["season"])))
+    rows = []
+    for club, season in sorted(club_seasons):
+        if season not in seasons:
+            continue
+        stat = club_season_stat(club_match_view(matches_exp, club, season))
+        if np.isnan(stat["d_resid"]):
+            continue
+        key = (club, season)
+        rows.append({"club": club, "season": season,
+                     "treated": key in n_dep.index,
+                     "n_departures": int(n_dep.get(key, 0)),
+                     "dose_eur": float(dose.get(key, 0.0) or 0.0), **stat})
+    panel = pd.DataFrame(rows)
+    assert not panel.duplicated(["club", "season"]).any(), "club-season not unique"
+    return panel
+
+
+def event_study(panel: pd.DataFrame, seed: int = 0) -> dict:
+    treated = panel[panel["treated"]]
+    lo, hi = analysis.bootstrap_ci(treated, lambda d: d["d_resid"].mean(), seed=seed)
+    return dict(mean_d_resid=float(treated["d_resid"].mean()),
+                mean_d_ppg=float(treated["d_ppg"].mean()),
+                n=int(len(treated)), ci_resid=(lo, hi))

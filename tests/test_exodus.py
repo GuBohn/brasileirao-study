@@ -75,3 +75,20 @@ def test_stat_nan_without_both_phases():
     rows = [_view_row("2015-05-10", "Flamengo", "X", "H", 1.8, 1.0)]  # pre only
     view = exodus.club_match_view(pd.DataFrame(rows), "Flamengo", 2015)
     assert np.isnan(exodus.club_season_stat(view)["d_resid"])
+
+
+def test_build_panel_partition_and_dose():
+    matches = _synthetic_matches()
+    matches_exp = exodus.elo_expected_points(matches)
+    departures = pd.DataFrame([
+        {"club": "Strong", "season": 2012, "transfer_date": pd.Timestamp("2012-07-10"),
+         "is_placeholder_date": False, "player": "p", "market_value_eur": 5e6, "to_club": "X"},
+        {"club": "Strong", "season": 2012, "transfer_date": pd.Timestamp("2012-08-01"),
+         "is_placeholder_date": False, "player": "q", "market_value_eur": 3e6, "to_club": "Y"},
+    ])
+    panel = exodus.build_panel(departures, matches_exp, seasons=[2012])
+    assert not panel.duplicated(["club", "season"]).any()
+    strong = panel[panel["club"] == "Strong"].iloc[0]
+    assert strong["treated"] and strong["n_departures"] == 2
+    assert abs(strong["dose_eur"] - 8e6) < 1e-6
+    assert (~panel[panel["club"] != "Strong"]["treated"]).all()

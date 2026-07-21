@@ -41,3 +41,37 @@ def test_home_advantage_at_zero_gap():
     m = exodus.elo_expected_points(_synthetic_matches())
     near0 = m[m["elo_diff"].abs() < 20]
     assert near0["exp_home_pts"].mean() > near0["exp_away_pts"].mean()
+
+
+def _view_row(date, home, away, outcome, exp_home, exp_away, elo_home=1500, elo_away=1500):
+    return {"date": pd.Timestamp(date), "season": 2015, "home_team": home,
+            "away_team": away, "outcome": outcome, "exp_home_pts": exp_home,
+            "exp_away_pts": exp_away, "elo_home_pre": elo_home, "elo_away_pre": elo_away}
+
+
+def test_phase_assignment_exhaustive_disjoint():
+    rows = [
+        _view_row("2015-05-10", "Flamengo", "X", "H", 1.8, 1.0),   # pre
+        _view_row("2015-07-20", "Flamengo", "Y", "H", 1.8, 1.0),   # window (excluded)
+        _view_row("2015-10-01", "Flamengo", "Z", "A", 1.8, 1.0),   # post
+    ]
+    view = exodus.club_match_view(pd.DataFrame(rows), "Flamengo", 2015)
+    assert list(view["phase"]) == ["pre", "window", "post"]
+
+
+def test_club_season_stat_hand_computed():
+    rows = [
+        _view_row("2015-05-10", "Flamengo", "X", "H", 1.8, 1.0),
+        _view_row("2015-05-20", "Flamengo", "X", "H", 2.0, 1.0),
+        _view_row("2015-10-01", "W", "Flamengo", "H", 1.5, 1.0),
+    ]
+    view = exodus.club_match_view(pd.DataFrame(rows), "Flamengo", 2015)
+    stat = exodus.club_season_stat(view)
+    assert abs(stat["d_resid"] - (-1.0 - 1.1)) < 1e-9      # -2.1
+    assert abs(stat["d_ppg"] - (0.0 - 3.0)) < 1e-9         # -3.0
+
+
+def test_stat_nan_without_both_phases():
+    rows = [_view_row("2015-05-10", "Flamengo", "X", "H", 1.8, 1.0)]  # pre only
+    view = exodus.club_match_view(pd.DataFrame(rows), "Flamengo", 2015)
+    assert np.isnan(exodus.club_season_stat(view)["d_resid"])

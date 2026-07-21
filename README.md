@@ -327,9 +327,10 @@ lives in
   relegation-race volatility, not just home advantage? *(Verdict: the most
   unpredictable of the six at both the match and the season level.)*
 - **[Chapter C — the mid-season exodus](docs/chapter-c-exodus.md).** Brazil's
-  transfer windows don't align with Europe's; star players are routinely sold to
-  European clubs mid-season. Does that misalignment show up as a measurable
-  performance dip for the clubs left behind — measured by an event study on
-  Elo-residual form around the sale, against a placebo no-effect floor and a
-  difference-in-differences check? *(Verdict: no detectable effect — a small
-  negative dip that does not clear the placebo floor.)*
+  transfer windows don't align with Europe's; star players (Neymar, Vinicius,
+  Rodrygo, Endrick…) are routinely sold to Europe mid-season. Does that misalignment
+  show up as a measurable rest-of-season dip for the clubs left behind — measured on
+  full Transfermarkt-scraped departures via a dose–response and a major-sale event
+  study against a placebo no-effect floor? *(Verdict: no detectable effect, now
+  well-powered — the dose–response is flat and the effect flips sign as the sale-size
+  threshold rises.)*

@@ -1,230 +1,183 @@
 # Chapter C — The Mid-Season Exodus: Does Losing a Star Mid-Campaign Cost You?
 
-In August 2021, with the Brasileirão not yet at its halfway point, Red Bull
-Bragantino sold Claudinho — the reigning league MVP, the man who had dragged a
-small São Paulo-state club into title contention — to Zenit St. Petersburg for
-around €11 million. The Russian season was just starting. The Brazilian season
-had another twenty rounds to run. Bragantino, in other words, lost their best
-player *in the middle of their own campaign*, and then had to keep playing it.
+In the middle of the 2013 Brasileirão season, Santos sold the 21-year-old Neymar
+to Barcelona for €88 million. Brazil's league was barely at its halfway point;
+Spain's was about to start. It is the most famous example of a structural quirk
+that repeats every single year: Brazil's Série A runs on the calendar year
+(April–December), while Europe's summer transfer window opens in July and closes
+in early September — squarely in the *middle* of the Brazilian season. So every
+July and August, Brazilian clubs ship their best players to Europe with half a
+league campaign still to play, and then have to keep playing it.
 
-This is not a freak event; it is structural. Brazil's Série A runs on the
-calendar year, roughly April to December. Europe's summer transfer window opens
-in July and closes in early September — squarely in the middle of the Brazilian
-season. So every year, a handful of Brazilian clubs watch a key player board a
-plane to Europe with half a league campaign still to play. This chapter asks the
-obvious question, and tries to answer it honestly: **does the club left behind
-actually suffer a measurable dip in form over the rest of the season?**
+The list of players who left mid-campaign is a who's-who of the modern game:
+Neymar, Vinicius Júnior (Flamengo → Real Madrid, €45m), Rodrygo (Santos → Real
+Madrid, €45m), Endrick (Palmeiras → Real Madrid, €47.5m), Oscar (Internacional →
+Chelsea, €32m), Arthur (Grêmio → Barcelona, €31m). This chapter asks the obvious
+question and tries to answer it honestly: **does the club left behind suffer a
+measurable dip in form over the rest of the season?**
 
-It is a harder question than it sounds, because the clubs that sell are not a
-random sample. A club that cashes in mid-season is often one that needs the money,
-or one whose player was playing well *because the team was* — and teams that are
-overperforming tend to regress with or without a sale. Selling and declining can
-travel together without one causing the other. So the whole design below is built
-around one discipline, carried straight over from Chapters A and B: **measure the
-apparent dip, then check it against a no-effect baseline before believing it.**
+The intuition says yes, obviously. The data — measured carefully, against a
+no-effect baseline, with the actual stars in the sample — says: **no, not
+detectably.** And that turns out to be the more interesting answer.
 
-## The data, and what it can and cannot tell us
+## The data: scraping the full picture
 
-Match results and pre-match [causal Elo](README.md) come from the same clean
-Brasileirão history used throughout this project (2003–2024). The **departures**
-come from the open [dcaribou Transfermarkt dataset](https://github.com/dcaribou/transfermarkt-datasets),
-a weekly-refreshed public dump — no fragile live scraping. Every departure is
-matched to a club by Transfermarkt's numeric `club_id`, never by name (club-name
-matching silently confuses foreign and youth sides, and was verified to inflate
-the sample badly).
+An earlier version of this analysis used an open Transfermarkt data dump and
+found only ~64 mid-season departures across twelve seasons — suspiciously few. The
+dump, it turned out, is biased toward a recent player universe and silently
+undercounts history: it was missing most of the stars above. So this version goes
+to the source. Match results and pre-match [causal Elo](README.md) come from the
+project's clean Brasileirão history (2003–2024); the **departures** come from
+scraping Transfermarkt's per-club-season transfer pages directly — rate-limited,
+cached to disk, and filtered to the **summer window** (which lands mid-Brazilian
+season), so no exact transfer date is even needed: the window *is* the treatment.
 
-Restricting to July–August departures by clubs that were actually in Série A that
-season, over 2012–2024, gives **64 departures across 53 club-seasons** — the
-"treated" group — against **187 non-selling club-seasons** as controls, out of 240
-in total. Three honest limitations shape everything that follows:
+That yields **3,330 summer departures** across the 240 Série A club-seasons of
+2012–2024 — fifty times what the dump saw — of which **1,227 are moves abroad**.
+The genuine star sales are the thin tail of that distribution; the bulk are loans
+and free transfers of squad players to smaller clubs.
 
-- **Market value is the only size signal available.** Transfer *fees* are recorded
-  for only ~11% of these moves, so they are unusable; **market value** is present
-  for **92%** and is what we use. But the values are small — median €0.7m, 90th
-  percentile €4.4m, a single €11m maximum (Claudinho) — and market value is a proxy
-  for how important a player was to his team, not a direct measure. The dataset only
-  carries Brazilian minutes played from 2024 onward, so a "share of the club's
-  minutes" measure isn't available historically.
-- **The sample is modest and recency-weighted**, which is why the window is
-  2012–2024 rather than the full history, and why some estimates below are
-  imprecise. We say so rather than dress it up.
-- **2020 is excluded.** Its COVID-shifted calendar (played August 2020 – February
-  2021) put the European summer window *before* the season even started, so there
-  was no mid-campaign to disrupt — the same "drop the season the design can't
-  measure" discipline Chapter B applied to Ligue 1's cancelled 2019/20.
+![Summer-window departures from Série A clubs, split domestic vs abroad, 2012–2024](reports/figures/exodus_departures_by_season.png)
 
-![Mid-season departures from Série A clubs by season, 2012–2024](reports/figures/exodus_departures_by_season.png)
+![Transfer fees of departures abroad — a thin star tail above a mass of small moves](reports/figures/exodus_fee_distribution.png)
 
-![Departure market values: most are small, with a thin high-dose tail](reports/figures/exodus_value_distribution.png)
+Two limitations shape what follows, stated plainly:
 
-The genuine "star leaves mid-campaign" cases — the ones the whole chapter is
-motivated by — are the thin right-hand tail of that value distribution: Claudinho
-(Bragantino → Zenit, 2021, €11m), Marcos Paulo (Fluminense → Atlético Madrid,
-2021, €9m), Mário Fernandes (Grêmio → CSKA Moscow, 2012, €9m), Kaiky (Santos →
-Almería, 2022, €8m), Souza (São Paulo → Fenerbahçe, 2015, €7.5m), Felipe
-(Corinthians → Porto, 2016, €6m). Only **7** of the 53 treated club-seasons lost
-a player worth €5m or more; **25** lost one worth at least €1m. Destinations are
-fragmented — Portugal's Portimonense is the single most common (5 of the 64), the
-classic stepping-stone route — so we treat the departure itself, not its
-destination, as the event.
+- **Transfer fees are the size signal, and they're partial.** Fees are recorded
+  for **45%** of the moves abroad (median €0.65m, up to Neymar's €88m); the rest
+  are loans or undisclosed. A player leaving on **loan** — even a significant one,
+  like a loan-with-obligation to a European club — carries no fee, so it counts as
+  a departure but contributes zero to the "how big was the sale" dose.
+- **Scraping is fragile and against Transfermarkt's terms.** It works, cached, at
+  a polite crawl rate, but a portfolio piece should say plainly that this source
+  is less robust and less clean than an official feed would be.
 
-## How to measure a "dip" without fooling yourself
+Portugal is overwhelmingly the first stop — Estoril, Portimonense, Benfica,
+Nacional, Porto and Santa Clara are the six most common destinations — the classic
+stepping-stone route before a bigger move.
 
-The outcome is not raw points. A club's second-half fixtures are not its
-first-half fixtures — the opponents differ in strength — so a naive "points before
-vs points after" would confuse *who you played* with *how a sale affected you*. So
-we measure **Elo-residual points**: for every match, the club's actual points minus
-the points its pre-match Elo rating says a team of its strength should expect
-against that specific opponent. Averaged over a stretch of matches, this residual
-is a schedule-adjusted read of whether a club is over- or under-performing its own
-established level.
+## Why "did they sell?" is the wrong question
 
-We split each club-season's fixtures at the transfer window: **pre-window** matches
-(before July 1), the **window itself** (July–August, excluded as a washout because
-a player leaving at an unknown point inside it makes those matches ambiguous), and
-**post-window** matches (from September 1). The statistic for a club-season is the
-change in mean Elo-residual points, **post minus pre**. A negative value means the
-club underperformed its own level more (or overperformed less) after the window
-than before it — the "dip" we're hunting for. The same split is applied identically
-to selling and non-selling clubs, so anything common to all clubs in the second
-half of a season differences out.
+Here is the fact that reshapes the whole analysis: **234 of the 240 club-seasons
+(98%) had at least one player leave for a foreign club that summer.** Selling
+someone abroad mid-season isn't an event that separates clubs — it's what every
+club does, every year. So the natural design of the earlier version — compare
+clubs that sold against clubs that didn't — is *degenerate here*: there is
+essentially no "didn't" group.
 
-Three estimators, layered from most direct to most defended — exactly the
-"primary metric + naive floor + honest confound check" structure of Chapters A
-and B:
+The signal, if there is one, cannot be *whether* a club sold. It has to be *how
+much* it sold. So the analysis pivots to two size-based tests, each measured the
+same honest way — the change in a club's **Elo-residual points** (actual minus
+what its pre-match rating expects, so the differing second-half schedule is netted
+out) from before the window to after it.
 
-## ① The apparent dip — and ③ whether it clears a no-effect floor
+## Test 1 — the dose–response
 
-Across the 53 treated club-seasons, the average post-minus-pre change in
-Elo-residual points is **−0.079 points per match** (raw points-per-game tells the
-same story: −0.073). Taken at face value, that is a dip: clubs that sold a player
-mid-season did do a little worse over the rest of the campaign than before it.
+If losing talent mid-season hurts, then losing *more* talent should hurt *more*.
+Plot every club-season's rest-of-season form change against the total fee it
+banked selling players abroad that summer, and the slope should run downhill.
 
-But "a little worse than before" is exactly what regression to the mean and
-ordinary second-half drift produce *without any sale at all*. To see how much of
-the −0.079 is real signal, we build a **placebo no-effect floor**: assign a fake
-July–August "departure" to the 187 non-selling club-seasons at random, compute the
-identical statistic, and repeat 2,000 times. The spread of those placebo results is
-what "no effect" looks like given this data's noise — the direct analog of the
-class-prior floor that every model in Chapters A and B had to clear.
+![Dose–response: total fee sold abroad versus rest-of-season form change — flat](reports/figures/exodus_dose_response.png)
 
-![Rest-of-season form change after a mid-season sale versus the placebo no-effect floor](reports/figures/exodus_effect_vs_placebo.png)
+It doesn't. The relationship is **flat**: the correlation between the (log) fee
+sold abroad and the rest-of-season change in Elo-residual points is **−0.01**,
+across all 240 club-seasons — indistinguishable from no relationship at all. Clubs
+that sold €50m of talent mid-season did not, on average, fall away any more than
+clubs that sold €2m.
 
-The real treated effect (**−0.079**) sits **inside** the placebo distribution's 95%
-band of **[−0.088, +0.160]**. It does not clear the floor. The event-study
-confidence interval says the same thing from the other direction: **[−0.238,
-+0.063]**, comfortably straddling zero. In plain terms: the dip we measured is
-smaller than the swings you get by drawing random non-selling clubs and pretending
-they sold someone. We cannot distinguish it from nothing.
+## Test 2 — the major-sale event study, and why the threshold matters
 
-## ② Difference-in-differences, and the trend that has to be parallel
+Maybe the effect only bites for *genuinely* big sales — a real starter or star,
+not squad filler. So define "treated" as a club-season that sold a player abroad
+for at least some fee threshold, compare its before/after form change to the
+non-selling clubs', and — crucially — check it against a **placebo no-effect
+floor** (assign fake sales to the control clubs and re-run, the same discipline as
+Chapters A and B). The trouble is choosing the threshold, so we don't choose one —
+we sweep it, and report what happens.
 
-The placebo floor handles noise, but not selection: maybe selling clubs really are
-different from non-selling ones. The last layer is a **difference-in-differences** —
-compare each treated club-season's post-minus-pre change against a non-selling
-control club-season matched to it on pre-window Elo (nearest strength), and take the
-difference. That removes any second-half drift common to comparable clubs and the
-mechanical regression they share.
+![The major-sale effect flips sign as the threshold rises; none clears the placebo floor](reports/figures/exodus_threshold_sensitivity.png)
 
-![Difference-in-differences and the pre-window parallel-trends check](reports/figures/exodus_did.png)
+| Treated = sold abroad for ≥ | Treated / Control | Effect (Δresid/match) | 95% CI | Clears floor? | DiD |
+|---|---|---|---|---|---|
+| €2m | 127 / 113 | **−0.034** | [−0.12, +0.05] | marginally | −0.13 |
+| €5m | 81 / 159 | **−0.012** | [−0.13, +0.10] | no | +0.00 |
+| €10m | 40 / 200 | **+0.109** | [−0.07, +0.29] | no | +0.19 |
 
-The DiD estimate is **−0.109 points per match** (treated clubs change by −0.079,
-their matched controls by +0.030). It leans a touch more negative than the raw
-event study — but it rests on a matching assumption that must be checked, and the
-left panel above is that check. Difference-in-differences is only credible if
-treated and control clubs were on **parallel trends before** the intervention;
-if selling clubs were already sliding faster, the "effect" is just that slide
-continuing. The pre-window residual slopes are **−0.012 for treated clubs and
-−0.041 for controls** — both mildly negative, treated if anything slightly *flatter*
-than control. The parallel-trends assumption is not violated, which is what makes
-the DiD worth reporting at all. The −0.109 estimate leans a touch more negative
-than the raw event study, but it sits comfortably inside that event study's own
-confidence interval of [−0.238, +0.063] — indistinguishable from zero. (The placebo
-floor above is the no-effect baseline for the single-group event-study statistic,
-not for this matched difference, so the headline test remains the event-study
-effect of −0.079, which does not clear it.)
-
-Finally, if mid-season sales genuinely hurt, *bigger* sales should hurt more. They
-don't, detectably: across the 48 treated club-seasons with a recorded market value,
-the correlation between how much value walked out the door and the size of the
-rest-of-season dip is **−0.185** — the right sign, but weak, and driven by a
-handful of points.
-
-![Dose–response: bigger sales are only weakly associated with bigger dips](reports/figures/exodus_dose_response.png)
+The estimate is **not stable**. At a €2m threshold it is mildly negative and just
+grazes the edge of the placebo floor — but its own confidence interval spans zero,
+and it does not survive to €5m. At a €10m threshold it actually turns *positive*:
+the clubs selling their biggest stars abroad (Santos, Flamengo, Palmeiras,
+Grêmio) tend to be the strongest clubs, who keep winning — and if anything post
+slightly *better* residuals afterward, not worse. No specification clears its
+placebo floor convincingly, and the difference-in-differences (matched on
+pre-window Elo) tells the same story, swinging from −0.13 to +0.19 across the
+same thresholds. Reporting the lone marginal €2m result as "the answer" would be
+exactly the cherry-picking this project forbids; the honest reading of a sign that
+flips with the threshold is **no stable effect**.
 
 ## The verdict
 
-Every estimator points the same direction — a small negative — but the headline
-effect does not clear its placebo no-effect floor, and the difference-in-differences
-estimate stays inside the event study's own confidence interval. The honest verdict
-is **(c): no detectable effect**. The point estimates are consistent with a *modest* rest-of-season dip for
-clubs that lose a player mid-campaign (somewhere around a tenth of a point per match,
-which over twenty remaining rounds would be roughly two points — a place or two in
-the table). But "consistent with a modest dip" is not the same as "shows a dip,"
-and the placebo floor is explicit that this data cannot tell the two apart. If the
-misalignment of Brazil's calendar with Europe's transfer windows exacts a
-competitive price on the clubs left behind, it is small enough that 53 mid-season
-sales over thirteen seasons cannot prove it exists.
+The honest verdict is **(c): no detectable effect** — and, unlike the sparse-data
+version, this one is *well-powered and hard to dismiss*. We now have the actual
+stars in the sample (Neymar, Vinicius, Rodrygo, Endrick, Oscar, Arthur), 234
+treated club-seasons instead of a few dozen, and every reasonable specification —
+a flat dose–response and a threshold sweep whose sign flips — points the same way:
+losing even a genuine star mid-campaign does not produce a measurable
+rest-of-season dip for the Brazilian club left behind.
 
-That is a genuine finding, not a failed one. The intuitive story — sell your star
-mid-season and your campaign falls apart — is the kind of narrative that feels
-obviously true and mostly isn't measurable, because the clubs are deep enough, the
-replacements quick enough, and the noise large enough that one player's July exit
-doesn't reliably move a season. It joins Chapter A's "the quirks don't beat Elo"
-and Chapter B's "the entropy metric lies" as a result whose value is in *not*
-overclaiming.
+Why might that be true? The clubs that sell the biggest players are the biggest
+clubs, with the deepest squads and the most cash to reinvest immediately; a
+Neymar or a Vinicius is sold *because* he is exceptional, but the team around him
+was already strong and stays in the league. Half a season is long enough for that
+depth, and for the ordinary noise of football, to swamp one player's July exit.
+The vivid story — sell your star mid-season and your campaign collapses — is one
+of those things that feels obviously true and simply isn't, once you put the real
+stars in the data and hold them against a no-effect baseline. It joins Chapter A's
+"the quirks don't beat Elo" and Chapter B's "the entropy metric lies" as a finding
+whose value is in refusing to overclaim.
 
 ## Limitations
 
-- **Modest, recency-weighted sample.** 53 treated club-seasons is enough to rule
-  out a *large* effect but not a small one; the wide confidence interval
-  ([−0.238, +0.063]) is the honest expression of that. A larger or longer sample
-  might resolve the small negative point estimate into a real, if minor, effect.
-- **Market value is a proxy for importance, not a measure of it.** A €0.7m median
-  means many "departures" were squad players whose exit shouldn't move a season; we
-  cannot weight by the share of minutes or goals a player actually contributed,
-  because Brazilian minutes data in this source begins only in 2024. The true "star
-  leaves" effect, if any, lives in the thin high-value tail, where the sample is
-  smallest.
-- **Selection on unobservables remains.** The DiD and parallel-trends check
-  address *observable* strength (pre-window Elo) and common drift, but a club that
-  sells because of a cash crisis or a dressing-room rift carries problems Elo can't
-  see. This is observational data; the placebo floor bounds the noise, not the
-  hidden confounds.
-- **Departures are counted gross, not net of arrivals.** A club that sold a star
-  and immediately bought a replacement had its true loss muted; we don't model
-  incoming signings, which biases the estimate *toward zero* — so a real effect
-  would be conservatively understated here, not inflated.
-- **Coarse dates.** About a fifth of the transfer dates are month-boundary
-  placeholders, so we place departures in the July–August *window* rather than on an
-  exact day; the excluded-washout split is designed to be robust to this, but it is
-  a coarsening.
-- **Season-ending collapses are dropped, not counted.** A club-season with no
-  post-window matches (e.g. a schedule quirk) is excluded for lack of an outcome —
-  a mild bias toward the null if a departure ever coincided with such a case.
+- **Fees are a partial, imperfect dose.** Only 45% of moves abroad carry a fee, so
+  the dose is measured on the disclosed subset; loans (even significant ones) enter
+  as zero-fee departures. A better size signal — say each player's share of the
+  club's minutes in the prior half-season — isn't available historically in this
+  source, so a small effect concentrated in truly irreplaceable players cannot be
+  fully ruled out.
+- **The source is a scrape.** Transfermarkt's club pages are unofficial and
+  scraped against their terms; the pipeline caches and crawls politely, but this is
+  less robust and less clean than a licensed feed, and the HTML can change.
+- **Selection on unobservables remains.** The biggest sellers are the strongest
+  clubs; the DiD matches on pre-window Elo and the placebo floor bounds the noise,
+  but a club selling under financial distress carries problems Elo cannot see.
+- **Departures are gross, not net of arrivals.** Clubs that sell a star often buy a
+  replacement in the same window; not modelling incoming signings biases the
+  estimate *toward zero*, so a real effect would be understated, not inflated.
+- **Half-season windows are noisy.** The outcome is a club's form over ~15–20
+  remaining matches; that is a short, noisy stretch, which is part of why even a
+  real effect of a plausible size would be hard to detect here.
 
 ## Reproduce
 
-Transfer events are downloaded on first run from the public dcaribou Transfermarkt
-R2 bucket and cached under `data/raw/` (gitignored); match results and Elo come
-from `data/processed/matches.parquet`, built by Chapter A's pipeline. All logic
-lives in `brasileirao.transfers` (acquire departures) and `brasileirao.exodus`
-(Elo-expected par points, the window split, and the three estimators); the
-notebooks hold only narrative and figures.
+Departures are scraped from Transfermarkt's per-club-season transfer pages on
+first run and cached under `data/raw/tm/` (gitignored); match results and Elo come
+from `data/processed/matches.parquet` (Chapter A's pipeline). All logic lives in
+`brasileirao.transfers` (the scraper + fee/destination parsing) and
+`brasileirao.exodus` (Elo-expected par points, the window split, and the
+estimators); the notebooks hold only narrative and figures.
 
 ```powershell
 # 1. Environment (Python 3.13) and tests
 .venv\Scripts\python -m pip install -e ".[dev]"
 .venv\Scripts\python -m pytest -q
 
-# 2. Assemble the departures table and run the event study
-.venv\Scripts\python -m jupyter nbconvert --to notebook --execute --inplace notebooks/06_transfer_data.ipynb --ExecutePreprocessor.timeout=600
+# 2. Scrape/assemble departures, then run the dose-response + threshold sweep
+#    (first run crawls ~240 pages at a polite rate; re-runs read the cache)
+.venv\Scripts\python -m jupyter nbconvert --to notebook --execute --inplace notebooks/06_transfer_data.ipynb --ExecutePreprocessor.timeout=1800
 .venv\Scripts\python -m jupyter nbconvert --to notebook --execute --inplace notebooks/07_exodus_event_study.ipynb --ExecutePreprocessor.timeout=900
 ```
 
-Notebook 06 builds and validates the departures table and the transfer-landscape
-figures; Notebook 07 computes the three estimators, renders the event-study figures,
-and prints the (a)/(b)/(c) verdict. Each headline number here — the treated/control
-counts, the event-study effect and CI, the placebo band, the DiD ATT, and the
-parallel-trends slopes — is printed by Notebook 07; the descriptive statistics come
-from Notebook 06 and the same `brasileirao` package code the notebooks call.
+Notebook 06 builds the departures table and the transfer-landscape figures;
+Notebook 07 runs the dose–response and the threshold sweep, renders the figures
+above, and prints the verdict. Each headline number here is printed by one of the
+two notebooks.

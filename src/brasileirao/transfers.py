@@ -129,12 +129,16 @@ def parse_departures(html: str, club: str, season: int) -> list[dict]:
         if name is None or len(tds) < 3:
             continue
         dest_cell = tds[-2]
-        dest_link = dest_cell.select_one("a")
+        # The destination cell nests a logo link (empty text) plus the club-name
+        # link (td.hauptlink) plus a league link; take the club name specifically.
+        club_link = (dest_cell.select_one("td.hauptlink a")
+                     or next((a for a in dest_cell.find_all("a")
+                              if a.get_text(strip=True)), None))
         fee, typ = _parse_fee(tds[-1].get_text(" ", strip=True))
         to_dest = dest_cell.get_text(" ", strip=True)
         rows.append({
             "club": club, "season": season, "player": name.get_text(strip=True),
-            "to_club": (dest_link.get_text(strip=True) if dest_link else to_dest),
+            "to_club": (club_link.get_text(strip=True) if club_link else to_dest),
             "to_dest": to_dest, "to_foreign": _is_foreign(to_dest),
             "fee_eur": fee, "transfer_type": typ,
         })

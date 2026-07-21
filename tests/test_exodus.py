@@ -128,3 +128,29 @@ def test_parallel_trends_reports_both_slopes():
     pt = exodus.parallel_trends(panel)
     assert abs(pt["treated_pre_slope"] - 0.2) < 1e-9
     assert abs(pt["control_pre_slope"] - (-0.1)) < 1e-9
+
+
+def test_did_matches_true_nearest_not_ceiling():
+    # treated pre_elo 1450 sits between controls 1400 (closer) and 1595. A
+    # ceiling-only matcher would wrongly pick 1595; nearest-neighbour picks 1400.
+    panel = pd.DataFrame({
+        "treated":   [True,  False, False],
+        "pre_elo":   [1450,  1400,  1595],
+        "d_resid":   [-0.5,  -0.2,   0.4],
+        "pre_slope": [0.0,   0.0,    0.0],
+    })
+    out = exodus.did(panel)
+    assert abs(out["att"] - (-0.3)) < 1e-9      # -0.5 - (-0.2), matched to 1400
+
+
+def test_dose_nan_coalesced_to_zero():
+    matches_exp = exodus.elo_expected_points(_synthetic_matches())
+    departures = pd.DataFrame([
+        {"club": "Strong", "season": 2012, "transfer_date": pd.Timestamp("2012-07-10"),
+         "is_placeholder_date": False, "player": "p", "market_value_eur": np.nan,
+         "to_club": "X"},
+    ])
+    panel = exodus.build_panel(departures, matches_exp, seasons=[2012])
+    strong = panel[panel["club"] == "Strong"].iloc[0]
+    assert strong["treated"] and strong["n_departures"] == 1
+    assert strong["dose_eur"] == 0.0            # NaN market value -> 0.0, not NaN

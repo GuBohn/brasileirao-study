@@ -16,8 +16,9 @@ _OUTCOME_TO_Y = {"H": 0, "D": 1, "A": 2}
 def elo_expected_points(matches: pd.DataFrame) -> pd.DataFrame:
     """Fit outcome ~ elo_diff (multinomial logit) and attach expected home/away
     league points per match. This is a strength 'par score', not an out-of-sample
-    forecast: any global fit bias cancels in each club-season's pre-minus-post
-    difference, which is all the estimators use."""
+    forecast: a global level bias cancels in each club-season's pre-minus-post
+    difference (which is all the estimators use), and a shape bias only to the
+    extent a club-season's elo_diff mix is similar pre and post."""
     m = ratings.add_elo(matches.sort_values("date").reset_index(drop=True))
     m["elo_diff"] = m["elo_home_pre"] - m["elo_away_pre"]
     y = m["outcome"].map(_OUTCOME_TO_Y)
@@ -92,10 +93,15 @@ def build_panel(departures: pd.DataFrame, matches_exp: pd.DataFrame,
         if np.isnan(stat["d_resid"]):
             continue
         key = (club, season)
+        # dose is NaN (not 0) when a treated club-season's only departures have
+        # no recorded market value; coalesce to 0.0 explicitly — `nan or 0.0` is
+        # nan in Python because NaN is truthy.
+        raw_dose = dose.get(key, 0.0)
         rows.append({"club": club, "season": season,
                      "treated": key in n_dep.index,
                      "n_departures": int(n_dep.get(key, 0)),
-                     "dose_eur": float(dose.get(key, 0.0) or 0.0), **stat})
+                     "dose_eur": 0.0 if pd.isna(raw_dose) else float(raw_dose),
+                     **stat})
     panel = pd.DataFrame(rows)
     assert not panel.duplicated(["club", "season"]).any(), "club-season not unique"
     return panel
@@ -124,13 +130,18 @@ def placebo_floor(panel: pd.DataFrame, n_iter: int = 2000, seed: int = 0) -> dic
 
 def _match_controls(panel: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Nearest-pre_elo control for each treated club-season (1:1, with
-    replacement) via a sorted search."""
+    replacement). searchsorted gives the ceiling neighbour; we also check the
+    floor neighbour (idx-1) and keep whichever pre_elo is actually closer."""
     treated = panel[panel["treated"]].dropna(subset=["pre_elo"]).copy()
     controls = (panel[~panel["treated"]].dropna(subset=["pre_elo"])
                 .sort_values("pre_elo").reset_index(drop=True))
-    idx = np.searchsorted(controls["pre_elo"].to_numpy(), treated["pre_elo"].to_numpy())
-    idx = np.clip(idx, 0, len(controls) - 1)
-    matched = controls.iloc[idx].reset_index(drop=True)
+    ctrl_elo = controls["pre_elo"].to_numpy()
+    t_elo = treated["pre_elo"].to_numpy()
+    hi = np.clip(np.searchsorted(ctrl_elo, t_elo), 0, len(controls) - 1)
+    lo = np.clip(hi - 1, 0, len(controls) - 1)
+    use_lo = np.abs(ctrl_elo[lo] - t_elo) < np.abs(ctrl_elo[hi] - t_elo)
+    nearest = np.where(use_lo, lo, hi)
+    matched = controls.iloc[nearest].reset_index(drop=True)
     return treated.reset_index(drop=True), matched
 
 

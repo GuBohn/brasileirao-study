@@ -22,7 +22,9 @@ CLUBS_URL = f"{R2}/clubs.csv.gz"
 # the 22 current BRA1 clubs in our universe; the second is now-relegated Serie A
 # clubs whose ids clubs.csv does not label (it carries only current top-flight
 # + European clubs). Ids verified against the dump. Extend when the BRA1 drift
-# guard (see _check_bra1_mapped) lists a new promoted club.
+# guard (see _check_bra1_mapped) lists a new promoted club. The last two are
+# 2025 promotions outside the 2012-2024 window (they never join matches.parquet,
+# so contribute no events).
 SERIE_A_CLUB_IDS = {
     17776: "Chapecoense", 2029: "Ceara", 978: "Vasco", 330: "Atletico-MG",
     679: "Athletico-PR", 614: "Flamengo", 776: "Coritiba", 609: "Cruzeiro",
@@ -33,6 +35,7 @@ SERIE_A_CLUB_IDS = {
     2863: "America-MG", 3197: "Goias", 1134: "Ponte Preta", 2035: "Avai",
     28022: "Cuiaba", 15172: "Atletico-GO", 18545: "CSA", 4064: "Figueirense",
     3330: "Joinville", 7178: "Criciuma", 2646: "Nautico", 309: "Parana",
+    10997: "Remo", 3876: "Mirassol",
 }
 
 WINDOW_MONTHS = (7, 8)               # European summer window = mid Brasileirao season

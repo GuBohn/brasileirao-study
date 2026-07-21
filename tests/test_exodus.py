@@ -82,9 +82,9 @@ def test_build_panel_partition_and_dose():
     matches_exp = exodus.elo_expected_points(matches)
     departures = pd.DataFrame([
         {"club": "Strong", "season": 2012, "transfer_date": pd.Timestamp("2012-07-10"),
-         "is_placeholder_date": False, "player": "p", "market_value_eur": 5e6, "to_club": "X"},
+         "is_placeholder_date": False, "player": "p", "fee_eur": 5e6, "to_club": "X"},
         {"club": "Strong", "season": 2012, "transfer_date": pd.Timestamp("2012-08-01"),
-         "is_placeholder_date": False, "player": "q", "market_value_eur": 3e6, "to_club": "Y"},
+         "is_placeholder_date": False, "player": "q", "fee_eur": 3e6, "to_club": "Y"},
     ])
     panel = exodus.build_panel(departures, matches_exp, seasons=[2012])
     assert not panel.duplicated(["club", "season"]).any()
@@ -147,7 +147,7 @@ def test_dose_nan_coalesced_to_zero():
     matches_exp = exodus.elo_expected_points(_synthetic_matches())
     departures = pd.DataFrame([
         {"club": "Strong", "season": 2012, "transfer_date": pd.Timestamp("2012-07-10"),
-         "is_placeholder_date": False, "player": "p", "market_value_eur": np.nan,
+         "is_placeholder_date": False, "player": "p", "fee_eur": np.nan,
          "to_club": "X"},
     ])
     panel = exodus.build_panel(departures, matches_exp, seasons=[2012])

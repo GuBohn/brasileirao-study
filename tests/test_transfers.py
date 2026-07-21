@@ -2,86 +2,56 @@ import pandas as pd
 import pytest
 
 from brasileirao import transfers
-from brasileirao.paths import RAW
 
 
-def _transfers_df(rows):
-    cols = ["from_club_id", "transfer_date", "market_value_in_eur",
-            "to_club_name", "player_name"]
-    return pd.DataFrame(rows, columns=cols)
+def test_parse_fee_variants():
+    fee, typ = transfers._parse_fee("€10.60m")
+    assert typ == "permanent" and fee == pytest.approx(10_600_000.0)
+    fee, typ = transfers._parse_fee("€145k")
+    assert typ == "permanent" and fee == pytest.approx(145_000.0)
+    fee, typ = transfers._parse_fee("Loan fee:€8.00m")
+    assert typ == "loan" and fee == pytest.approx(8_000_000.0)
+    assert transfers._parse_fee("loan transfer") == (None, "loan")
+    assert transfers._parse_fee("free transfer") == (0.0, "free")
+    assert transfers._parse_fee("?") == (None, "permanent")
 
 
-def _matches_df(pairs):
-    # pairs: list of (team, season); create a single self-match row per pair
-    r = [{"home_team": t, "away_team": "X", "season": s} for t, s in pairs]
-    return pd.DataFrame(r)
+def test_is_foreign_uses_accent_and_markers():
+    assert transfers._is_foreign("Inter Serie A")             # Italy (no accent)
+    assert transfers._is_foreign("Aris Limassol Cyprus League")
+    assert not transfers._is_foreign("São Paulo Série A")     # Brazil (accented)
+    assert not transfers._is_foreign("Ferroviária Brazil")    # Brazil lower tier
+    assert not transfers._is_foreign("Without Club")          # release, not abroad
 
 
-CLUBS_OK = pd.DataFrame({"club_id": list(transfers.SERIE_A_CLUB_IDS),
-                         "domestic_competition_id": "BRA1"})
+DEPARTURES_HTML = """
+<h2>Departures</h2>
+<table class="items"><tbody>
+  <tr>
+    <td class="hauptlink"><a href="/x">Léo Duarte</a></td><td>23</td><td>BRA</td>
+    <td><a href="/inter">Inter</a> Serie A</td><td>€10.60m</td>
+  </tr>
+  <tr>
+    <td class="hauptlink"><a href="/y">Fulano</a></td><td>25</td><td>BRA</td>
+    <td><a href="/goias">Goiás</a> Série A</td><td>loan transfer</td>
+  </tr>
+</tbody></table>
+"""
 
 
-def test_keeps_only_window_season_and_member_clubseasons():
-    tr = _transfers_df([
-        (614, "2015-07-15", 5e6, "FC Porto", "A"),   # Flamengo 2015 Jul -> keep
-        (614, "2015-01-20", 5e6, "FC Porto", "B"),   # January -> drop
-        (614, "2020-07-15", 5e6, "FC Porto", "C"),   # 2020 excluded -> drop
-        (614, "2011-07-15", 5e6, "FC Porto", "D"),   # pre-2012 -> drop
-        (999, "2015-07-15", 5e6, "FC Porto", "E"),   # unmapped club -> drop
-    ])
-    matches = _matches_df([("Flamengo", 2015)])
-    dep = transfers.build_departures(tr, CLUBS_OK, matches)
-    assert list(dep["player"]) == ["A"]
-    assert dep.loc[0, "club"] == "Flamengo" and dep.loc[0, "season"] == 2015
+def test_parse_departures_extracts_fields_and_foreign():
+    rows = transfers.parse_departures(DEPARTURES_HTML, "Flamengo", 2019)
+    assert len(rows) == 2
+    leo, dom = rows
+    assert leo["player"] == "Léo Duarte" and leo["to_club"] == "Inter"
+    assert leo["to_foreign"] and leo["transfer_type"] == "permanent"
+    assert leo["fee_eur"] == pytest.approx(10_600_000.0)
+    assert not dom["to_foreign"] and dom["transfer_type"] == "loan"
+    assert dom["fee_eur"] is None
 
 
-def test_clubseason_not_in_serie_a_is_dropped():
-    tr = _transfers_df([(614, "2015-07-15", 5e6, "FC Porto", "A")])
-    dep = transfers.build_departures(tr, CLUBS_OK, _matches_df([("Flamengo", 2016)]))
-    assert dep.empty
-
-
-def test_placeholder_date_flagged_not_dropped():
-    tr = _transfers_df([
-        (614, "2015-07-01", 5e6, "FC Porto", "ph"),    # placeholder
-        (614, "2015-07-15", 5e6, "FC Porto", "real"),  # real
-    ])
-    dep = transfers.build_departures(tr, CLUBS_OK, _matches_df([("Flamengo", 2015)]))
-    flags = dict(zip(dep["player"], dep["is_placeholder_date"]))
-    assert flags == {"ph": True, "real": False}
-
-
-def test_unmapped_bra1_club_raises():
-    clubs = pd.concat([CLUBS_OK,
-                       pd.DataFrame({"club_id": [123456],
-                                     "domestic_competition_id": ["BRA1"]})])
-    with pytest.raises(ValueError, match="not in SERIE_A_CLUB_IDS"):
-        transfers.build_departures(_transfers_df([]), clubs, _matches_df([]))
-
-
-def test_no_duplicate_departures():
-    # rows differ in market value + destination but share the dedup key
-    # (club, season, transfer_date, player), so the 4-column subset must collapse
-    # them to one — proving the subset key, not a whole-row dedup, is at work.
-    tr = _transfers_df([
-        (614, "2015-07-15", 5e6, "FC Porto", "A"),
-        (614, "2015-07-15", 9e6, "Real Madrid", "A"),
-    ])
-    dep = transfers.build_departures(tr, CLUBS_OK, _matches_df([("Flamengo", 2015)]))
-    assert len(dep) == 1
-
-
-def test_is_corrupt_detects_non_gzip():
-    assert transfers._is_corrupt(b"")                    # empty
-    assert transfers._is_corrupt(b"\x00\x00")            # NUL-filled partial
-    assert transfers._is_corrupt(b"<!DOCTYPE html>")     # HTML 403/error page
-    assert not transfers._is_corrupt(b"\x1f\x8b")        # valid gzip magic
-
-
-@pytest.mark.skipif(not (RAW / "tm_transfers.csv.gz").exists(),
-                    reason="run transfers.build() first to cache the dump")
-def test_real_dump_has_reasonable_treated_set():
-    dep = transfers.build()
-    treated = dep.groupby(["club", "season"]).ngroups
-    assert 40 <= treated <= 80, f"treated club-seasons drifted to {treated}"
-    assert dep["market_value_eur"].notna().mean() > 0.8
+def test_serie_a_completeness_raises_on_unmapped_club():
+    m = pd.DataFrame({"home_team": ["Nonexistent FC"], "away_team": ["Flamengo"],
+                      "season": [2015]})
+    with pytest.raises(ValueError, match="no Transfermarkt id"):
+        transfers._serie_a_club_seasons(m)

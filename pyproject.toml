@@ -13,6 +13,8 @@ dependencies = [
     "matplotlib>=3.8",
     "jupyter>=1.0",
     "nbconvert>=7.16",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
 ]
 
 [project.optional-dependencies]

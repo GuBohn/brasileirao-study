@@ -81,7 +81,10 @@ SEASONS = [s for s in range(2012, 2025) if s != 2020]
 
 def build_panel(departures: pd.DataFrame, matches_exp: pd.DataFrame,
                 seasons=SEASONS) -> pd.DataFrame:
-    dose = departures.groupby(["club", "season"])["market_value_eur"].sum(min_count=1)
+    """`departures` should already be filtered to the treatment events (e.g. the
+    summer departures abroad); a club-season is treated iff it appears here, and
+    its dose is the summed transfer fee of those departures."""
+    dose = departures.groupby(["club", "season"])["fee_eur"].sum(min_count=1)
     n_dep = departures.groupby(["club", "season"]).size()
     club_seasons = (set(zip(matches_exp["home_team"], matches_exp["season"]))
                     | set(zip(matches_exp["away_team"], matches_exp["season"])))
@@ -94,8 +97,8 @@ def build_panel(departures: pd.DataFrame, matches_exp: pd.DataFrame,
             continue
         key = (club, season)
         # dose is NaN (not 0) when a treated club-season's only departures have
-        # no recorded market value; coalesce to 0.0 explicitly — `nan or 0.0` is
-        # nan in Python because NaN is truthy.
+        # an undisclosed fee (loans, "?"); coalesce to 0.0 explicitly — `nan or
+        # 0.0` is nan in Python because NaN is truthy.
         raw_dose = dose.get(key, 0.0)
         rows.append({"club": club, "season": season,
                      "treated": key in n_dep.index,

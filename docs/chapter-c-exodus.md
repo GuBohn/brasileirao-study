@@ -52,9 +52,10 @@ Two limitations shape what follows, stated plainly:
   a polite crawl rate, but a portfolio piece should say plainly that this source
   is less robust and less clean than an official feed would be.
 
-Portugal is overwhelmingly the first stop — Estoril, Portimonense, Benfica,
-Nacional, Porto and Santa Clara are the six most common destinations — the classic
-stepping-stone route before a bigger move.
+Portugal is the most common first stop — Estoril and Portimonense are the two
+single most frequent destinations, the classic stepping-stone route — though the
+next-busiest are Italy's Udinese and Ukraine's Shakhtar Donetsk, both well-known
+importers of Brazilian talent, before Benfica, Nacional and Porto.
 
 ## Why "did they sell?" is the wrong question
 

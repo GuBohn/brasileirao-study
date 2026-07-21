@@ -61,11 +61,11 @@ The genuine "star leaves mid-campaign" cases — the ones the whole chapter is
 motivated by — are the thin right-hand tail of that value distribution: Claudinho
 (Bragantino → Zenit, 2021, €11m), Marcos Paulo (Fluminense → Atlético Madrid,
 2021, €9m), Mário Fernandes (Grêmio → CSKA Moscow, 2012, €9m), Kaiky (Santos →
-Almería, 2022, €8m), Souza (São Paulo → Fenerbahçe, 2015, €8m), Felipe
+Almería, 2022, €8m), Souza (São Paulo → Fenerbahçe, 2015, €7.5m), Felipe
 (Corinthians → Porto, 2016, €6m). Only **7** of the 53 treated club-seasons lost
-a player worth €5m or more; **25** lost one worth at least €1m. Portugal is the
-single most common destination — the classic stepping stone — but a third of moves
-go to clubs the dataset can't identify, so we treat the departure itself, not its
+a player worth €5m or more; **25** lost one worth at least €1m. Destinations are
+fragmented — Portugal's Portimonense is the single most common (5 of the 64), the
+classic stepping-stone route — so we treat the departure itself, not its
 destination, as the event.
 
 ## How to measure a "dip" without fooling yourself
@@ -137,8 +137,12 @@ if selling clubs were already sliding faster, the "effect" is just that slide
 continuing. The pre-window residual slopes are **−0.012 for treated clubs and
 −0.041 for controls** — both mildly negative, treated if anything slightly *flatter*
 than control. The parallel-trends assumption is not violated, which is what makes
-the DiD worth reporting at all; but −0.109 is still well within the range the
-placebo floor calls noise.
+the DiD worth reporting at all. The −0.109 estimate leans a touch more negative
+than the raw event study, but it sits comfortably inside that event study's own
+confidence interval of [−0.238, +0.063] — indistinguishable from zero. (The placebo
+floor above is the no-effect baseline for the single-group event-study statistic,
+not for this matched difference, so the headline test remains the event-study
+effect of −0.079, which does not clear it.)
 
 Finally, if mid-season sales genuinely hurt, *bigger* sales should hurt more. They
 don't, detectably: across the 48 treated club-seasons with a recorded market value,
@@ -150,9 +154,10 @@ handful of points.
 
 ## The verdict
 
-Every estimator points the same direction — a small negative — and not one of them
-clears its own no-effect baseline. The honest verdict is **(c): no detectable
-effect**. The point estimates are consistent with a *modest* rest-of-season dip for
+Every estimator points the same direction — a small negative — but the headline
+effect does not clear its placebo no-effect floor, and the difference-in-differences
+estimate stays inside the event study's own confidence interval. The honest verdict
+is **(c): no detectable effect**. The point estimates are consistent with a *modest* rest-of-season dip for
 clubs that lose a player mid-campaign (somewhere around a tenth of a point per match,
 which over twenty remaining rounds would be roughly two points — a place or two in
 the table). But "consistent with a modest dip" is not the same as "shows a dip,"
@@ -217,6 +222,9 @@ notebooks hold only narrative and figures.
 .venv\Scripts\python -m jupyter nbconvert --to notebook --execute --inplace notebooks/07_exodus_event_study.ipynb --ExecutePreprocessor.timeout=900
 ```
 
-Notebook 06 builds and validates the departures table; Notebook 07 computes the
-three estimators, renders every figure above, and prints the (a)/(b)/(c) verdict.
-Each number in this article traces to a value printed by Notebook 07.
+Notebook 06 builds and validates the departures table and the transfer-landscape
+figures; Notebook 07 computes the three estimators, renders the event-study figures,
+and prints the (a)/(b)/(c) verdict. Each headline number here — the treated/control
+counts, the event-study effect and CI, the placebo band, the DiD ATT, and the
+parallel-trends slopes — is printed by Notebook 07; the descriptive statistics come
+from Notebook 06 and the same `brasileirao` package code the notebooks call.

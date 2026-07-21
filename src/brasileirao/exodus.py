@@ -120,3 +120,29 @@ def placebo_floor(panel: pd.DataFrame, n_iter: int = 2000, seed: int = 0) -> dic
                       for _ in range(n_iter)])
     lo, hi = np.quantile(draws, [0.025, 0.975])
     return dict(mean=float(draws.mean()), lo=float(lo), hi=float(hi), dist=draws)
+
+
+def _match_controls(panel: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Nearest-pre_elo control for each treated club-season (1:1, with
+    replacement) via a sorted search."""
+    treated = panel[panel["treated"]].dropna(subset=["pre_elo"]).copy()
+    controls = (panel[~panel["treated"]].dropna(subset=["pre_elo"])
+                .sort_values("pre_elo").reset_index(drop=True))
+    idx = np.searchsorted(controls["pre_elo"].to_numpy(), treated["pre_elo"].to_numpy())
+    idx = np.clip(idx, 0, len(controls) - 1)
+    matched = controls.iloc[idx].reset_index(drop=True)
+    return treated.reset_index(drop=True), matched
+
+
+def did(panel: pd.DataFrame) -> dict:
+    treated, matched = _match_controls(panel)
+    att = float(treated["d_resid"].mean() - matched["d_resid"].mean())
+    return dict(att=att, n_treated=int(len(treated)),
+                treated_mean=float(treated["d_resid"].mean()),
+                control_mean=float(matched["d_resid"].mean()))
+
+
+def parallel_trends(panel: pd.DataFrame) -> dict:
+    treated, matched = _match_controls(panel)
+    return dict(treated_pre_slope=float(treated["pre_slope"].mean()),
+                control_pre_slope=float(matched["pre_slope"].mean()))

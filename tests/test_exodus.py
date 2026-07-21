@@ -104,3 +104,27 @@ def test_placebo_uses_only_controls_and_is_reproducible():
     assert a["dist"].tolist() == b["dist"].tolist()
     assert abs(a["mean"] - (-1.0)) < 1e-9
     assert a["lo"] <= a["mean"] <= a["hi"]
+
+
+def test_did_hand_computed():
+    panel = pd.DataFrame({
+        "treated":   [True,  True,  False, False],
+        "pre_elo":   [1600,  1400,  1595,  1405],
+        "d_resid":   [-0.5,  -0.3,   0.1,  -0.1],
+        "pre_slope": [0.0,   0.0,    0.0,   0.0],
+    })
+    out = exodus.did(panel)
+    assert abs(out["att"] - (-0.4)) < 1e-9
+    assert out["n_treated"] == 2
+
+
+def test_parallel_trends_reports_both_slopes():
+    panel = pd.DataFrame({
+        "treated":   [True,  False, False],
+        "pre_elo":   [1500,  1498,  1502],
+        "d_resid":   [-0.5,  0.0,   0.0],
+        "pre_slope": [0.2,  -0.1,  -0.1],
+    })
+    pt = exodus.parallel_trends(panel)
+    assert abs(pt["treated_pre_slope"] - 0.2) < 1e-9
+    assert abs(pt["control_pre_slope"] - (-0.1)) < 1e-9

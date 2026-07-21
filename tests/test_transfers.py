@@ -60,12 +60,22 @@ def test_unmapped_bra1_club_raises():
 
 
 def test_no_duplicate_departures():
+    # rows differ in market value + destination but share the dedup key
+    # (club, season, transfer_date, player), so the 4-column subset must collapse
+    # them to one — proving the subset key, not a whole-row dedup, is at work.
     tr = _transfers_df([
         (614, "2015-07-15", 5e6, "FC Porto", "A"),
-        (614, "2015-07-15", 5e6, "FC Porto", "A"),  # exact dup
+        (614, "2015-07-15", 9e6, "Real Madrid", "A"),
     ])
     dep = transfers.build_departures(tr, CLUBS_OK, _matches_df([("Flamengo", 2015)]))
     assert len(dep) == 1
+
+
+def test_is_corrupt_detects_non_gzip():
+    assert transfers._is_corrupt(b"")                    # empty
+    assert transfers._is_corrupt(b"\x00\x00")            # NUL-filled partial
+    assert transfers._is_corrupt(b"<!DOCTYPE html>")     # HTML 403/error page
+    assert not transfers._is_corrupt(b"\x1f\x8b")        # valid gzip magic
 
 
 @pytest.mark.skipif(not (RAW / "tm_transfers.csv.gz").exists(),

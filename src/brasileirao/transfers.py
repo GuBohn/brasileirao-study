@@ -7,7 +7,6 @@ badly (youth "U20"/"B" sides, foreign "Sporting", Atletico-PR vs Atletico-MG),
 and substring matching was verified to inflate the treated set. Match results
 and Elo come from matches.parquet, not from here.
 """
-import gzip
 import urllib.request
 
 import pandas as pd
@@ -41,11 +40,23 @@ SERIE_A_CLUB_IDS = {
 WINDOW_MONTHS = (7, 8)               # European summer window = mid Brasileirao season
 FIRST_SEASON, LAST_SEASON = 2012, 2024
 EXCLUDE_SEASONS = {2020}             # COVID-shifted calendar: summer window pre-kickoff
-# Transfermarkt month-boundary stand-ins for an unknown exact day.
-PLACEHOLDER_MD = {"01-01", "02-01", "06-30", "07-01", "12-01", "12-31"}
+# Transfermarkt month-boundary stand-ins for an unknown exact day. (After the
+# Jul/Aug window filter only "07-01" can survive to be flagged; the rest
+# document TM's placeholder vocabulary for readers.)
+PLACEHOLDER_MD = {"01-01", "02-01", "06-30", "07-01", "08-01", "12-01", "12-31"}
 
 DEPARTURE_COLS = ["club", "season", "transfer_date", "is_placeholder_date",
                   "player", "market_value_eur", "to_club"]
+
+
+def _is_corrupt(head: bytes) -> bool:
+    """A gzip file starts with the magic bytes 0x1f 0x8b. Anything else — an
+    empty file, a NUL-filled partial write, or an HTML error / 403 page — is a
+    bad download. Checked on the RAW bytes (never decompressed), so it can never
+    raise: decompressing first would throw BadGzipFile before this ran and leave
+    the bad file cached forever (the NUL-cache bug already paid for in
+    leagues.py). Mirrors leagues._is_corrupt."""
+    return len(head) < 2 or head[:2] != b"\x1f\x8b"
 
 
 def _download_gz(url: str, path) -> None:
@@ -56,12 +67,12 @@ def _download_gz(url: str, path) -> None:
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req) as resp, open(path, "wb") as out:
         out.write(resp.read())
-    with gzip.open(path, "rb") as fh:
-        head = fh.read(64)
-    if len(head) == 0 or head[:1] == b"\x00":
+    with open(path, "rb") as fh:
+        head = fh.read(2)
+    if _is_corrupt(head):
         path.unlink()
         raise ValueError(
-            f"Downloaded {url} looks corrupt (empty/NUL); deleted {path.name} "
+            f"Downloaded {url} looks corrupt (not gzip); deleted {path.name} "
             "so a re-run retries the fetch."
         )
 

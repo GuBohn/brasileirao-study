@@ -37,9 +37,9 @@ That yields **3,330 summer departures** across the 240 Série A club-seasons of
 The genuine star sales are the thin tail of that distribution; the bulk are loans
 and free transfers of squad players to smaller clubs.
 
-![Summer-window departures from Série A clubs, split domestic vs abroad, 2012–2024](reports/figures/exodus_departures_by_season.png)
+![Summer-window departures from Série A clubs, split domestic vs abroad, 2012–2024](../reports/figures/exodus_departures_by_season.png)
 
-![Transfer fees of departures abroad — a thin star tail above a mass of small moves](reports/figures/exodus_fee_distribution.png)
+![Transfer fees of departures abroad — a thin star tail above a mass of small moves](../reports/figures/exodus_fee_distribution.png)
 
 Two limitations shape what follows, stated plainly:
 
@@ -78,7 +78,7 @@ If losing talent mid-season hurts, then losing *more* talent should hurt *more*.
 Plot every club-season's rest-of-season form change against the total fee it
 banked selling players abroad that summer, and the slope should run downhill.
 
-![Dose–response: total fee sold abroad versus rest-of-season form change — flat](reports/figures/exodus_dose_response.png)
+![Dose–response: total fee sold abroad versus rest-of-season form change — flat](../reports/figures/exodus_dose_response.png)
 
 It doesn't. The relationship is **flat**: the correlation between the (log) fee
 sold abroad and the rest-of-season change in Elo-residual points is **−0.01**,
@@ -96,7 +96,7 @@ floor** (assign fake sales to the control clubs and re-run, the same discipline 
 Chapters A and B). The trouble is choosing the threshold, so we don't choose one —
 we sweep it, and report what happens.
 
-![The major-sale effect flips sign as the threshold rises; none clears the placebo floor](reports/figures/exodus_threshold_sensitivity.png)
+![The major-sale effect flips sign as the threshold rises; none clears the placebo floor](../reports/figures/exodus_threshold_sensitivity.png)
 
 | Treated = sold abroad for ≥ | Treated / Control | Effect (Δresid/match) | 95% CI | Clears floor? | DiD |
 |---|---|---|---|---|---|

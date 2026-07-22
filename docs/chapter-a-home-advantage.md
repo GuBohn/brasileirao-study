@@ -26,7 +26,7 @@ of all points actually awarded in a set of matches that went to the home
 side, explained fully below — compared with **0.600** in Spain's La Liga and
 **0.585** in England's Premier League.
 
-![Home advantage 2015–2018: Brasileirão vs Premier League and La Liga, using the same home-points-share metric](reports/figures/cross_league_home_advantage.png)
+![Home advantage 2015–2018: Brasileirão vs Premier League and La Liga, using the same home-points-share metric](../reports/figures/cross_league_home_advantage.png)
 
 **Methods at a glance:** this project demonstrates causal (pre-match-only)
 Elo ratings, bootstrap confidence intervals, a natural-experiment /
@@ -50,7 +50,7 @@ their head (49.6% of matches are home wins, 26.4% draws, 23.9% away wins) —
 the accounting itself pulls the number upward before home advantage even
 enters the picture.
 
-![Brasileirão home points share by season, 2003–2024, with a 95% bootstrap confidence interval band](reports/figures/home_points_share.png)
+![Brasileirão home points share by season, 2003–2024, with a 95% bootstrap confidence interval band](../reports/figures/home_points_share.png)
 
 The chart above plots that share season by season, with a shaded band
 showing a 95% bootstrap confidence interval — built by resampling each
@@ -87,7 +87,7 @@ sits entirely above zero, the direction of the effect is fairly trustworthy —
 crowds add something — but the interval is wide, so this is evidence that an
 effect exists, not a precise measurement of its size.
 
-![Home points share with fans present (2017–19 control seasons) versus the closed-door 2020–21 window, with 95% bootstrap confidence intervals](reports/figures/crowd_effect.png)
+![Home points share with fans present (2017–19 control seasons) versus the closed-door 2020–21 window, with 95% bootstrap confidence intervals](../reports/figures/crowd_effect.png)
 
 Three things temper how far to read into this number. First, it's a
 before/after comparison of two non-randomised windows, not a controlled
@@ -125,7 +125,7 @@ restriction narrows the sample from 8,785 to 5,626 matches, and the near-zero
 mean Elo gap reported within each distance bin is the evidence the balancing
 trick worked.
 
-![Away points share by travel distance, restricted to Elo-balanced matches, with 95% bootstrap confidence intervals](reports/figures/travel_effect.png)
+![Away points share by travel distance, restricted to Elo-balanced matches, with 95% bootstrap confidence intervals](../reports/figures/travel_effect.png)
 
 The result is not the smooth "farther is harder" story a simple intuition
 might predict. Away points share sits at 0.355 for trips under 400 km, 0.358
@@ -149,7 +149,7 @@ subset and the same logic as the travel test, this analysis bins fixtures by
 how much hotter or colder the match city is than the away team's home city
 and compares away performance across bins.
 
-![Away points share by temperature gap between match city and the away team's home city, Elo-balanced matches, with 95% bootstrap confidence intervals](reports/figures/heat_effect.png)
+![Away points share by temperature gap between match city and the away team's home city, Elo-balanced matches, with 95% bootstrap confidence intervals](../reports/figures/heat_effect.png)
 
 The result is a clean null: away points share is 0.340 when the away team
 travels somewhere colder than home, 0.364 when the climate is similar, and
@@ -194,7 +194,7 @@ heat, rest, crowd status, same-state derbies) on top of Elo scores
 **1.0318** — also 15 of 15 seasons ahead of the floor, but very slightly
 *behind* the Elo-only model.
 
-![Log-loss improvement of the full model over the Elo-only model, by test season, against the Elo-only model's average edge over the naive class-prior floor](reports/figures/model_lift.png)
+![Log-loss improvement of the full model over the Elo-only model, by test season, against the Elo-only model's average edge over the naive class-prior floor](../reports/figures/model_lift.png)
 
 That gap between the two fitted models — a mean lift of **−0.0015**,
 positive in only 8 of 15 seasons — is an order of magnitude smaller than
@@ -211,7 +211,7 @@ home win actually produce a home win about 60% of the time — sits close to
 the diagonal through the bulk of its predictions, with only mild
 overconfidence at the strongest-favourite end.
 
-![Calibration curve: predicted home-win probability against observed home-win frequency, out-of-fold](reports/figures/calibration.png)
+![Calibration curve: predicted home-win probability against observed home-win frequency, out-of-fold](../reports/figures/calibration.png)
 
 **SHAP** (SHapley Additive exPlanations — a method that attributes each
 individual prediction to the contribution of each input feature) confirms
@@ -220,7 +220,7 @@ the gap in Elo ratings between the two teams — dwarfs every other feature in
 importance; `travel_km` is the strongest of the quirk features, but a
 distant third overall; `same_state` contributes almost nothing.
 
-![SHAP summary plot for the away-win class: feature importance and direction of effect](reports/figures/shap_summary.png)
+![SHAP summary plot for the away-win class: feature importance and direction of effect](../reports/figures/shap_summary.png)
 
 The SHAP dependence plot for travel distance reproduces the non-linear shape
 found earlier with plain bootstrap confidence intervals: a staircase rather
@@ -231,7 +231,7 @@ the average predicted away-win probability moves from **25.4%** at 0 km, to
 **23.7%** at 2,000 km, to **19.1%** at 3,000 km: a small, gradual drop over
 the first 2,000 km and a much sharper one over the last 1,000.
 
-![SHAP dependence plot for travel_km against the away-win class](reports/figures/shap_travel.png)
+![SHAP dependence plot for travel_km against the away-win class](../reports/figures/shap_travel.png)
 
 Finally, a market benchmark, reported for context rather than as a target
 this project claims to beat: Pinnacle's closing odds (available for the

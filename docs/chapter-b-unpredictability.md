@@ -33,7 +33,7 @@ season complete in all six from **2012 to 2025** — **30,560 matches**. Seasons
 are labelled by the calendar year they start, so Brazil's calendar-year 2012 and
 Europe's 2012/13 line up directly.
 
-![Matched sample by league, 2012–2025: matches contributed by each of the six leagues](reports/figures/league_coverage.png)
+![Matched sample by league, 2012–2025: matches contributed by each of the six leagues](../reports/figures/league_coverage.png)
 
 Two structural facts show up in that chart and matter later: the **Bundesliga**
 fields 18 teams (306 matches a season, not 380), and **Ligue 1** cut from 20 to
@@ -97,7 +97,7 @@ next two figures.
 
 ## Level 1 — Is every weekend a coin flip?
 
-![Outcome entropy by league: the Brasileirão is lowest, a home-advantage artifact](reports/figures/entropy.png)
+![Outcome entropy by league: the Brasileirão is lowest, a home-advantage artifact](../reports/figures/entropy.png)
 
 Exactly as warned, the Brasileirão has the **lowest** raw entropy of the six
 (**1.513** bits, against Serie A's league-high **1.553** and a theoretical
@@ -107,7 +107,7 @@ its outsized home advantage concentrating results on the home win. The
 confidence intervals are tight but the differences between leagues are small;
 this chart's real job is to be the cautionary one.
 
-![Underdog points share: the Brasileirão gives underdogs the largest share of any league](reports/figures/upset_rate.png)
+![Underdog points share: the Brasileirão gives underdogs the largest share of any league](../reports/figures/upset_rate.png)
 
 Switch to the home-advantage-proof metric and the picture inverts. In the
 Brasileirão, pre-match underdogs collect **41.3%** of all points on offer — the
@@ -117,7 +117,7 @@ underdog banks about a fifth more of the available points than its Italian
 counterpart. Weekend to weekend, the favourite's edge really is smaller in
 Brazil.
 
-![Forecastability: floor vs Elo model vs bookmaker log loss per league](reports/figures/forecastability.png)
+![Forecastability: floor vs Elo model vs bookmaker log loss per league](../reports/figures/forecastability.png)
 
 Forecastability tells the same story from the model's side. Every league clears
 its floor (the mis-specification gate passes for all six), but by how much varies
@@ -137,7 +137,7 @@ Chaotic weekends are necessary for an open league, not sufficient. A season is
 120-odd matches long; noise can wash out, and the strongest squad can still
 grind to the top. Does it?
 
-![Noll–Scully standings spread: the Brasileirão table is the most compressed](reports/figures/noll_scully.png)
+![Noll–Scully standings spread: the Brasileirão table is the most compressed](../reports/figures/noll_scully.png)
 
 No. The Brasileirão's final tables are the **most compressed** of the six, with
 a Noll–Scully ratio of **1.68** — still above the chance baseline of 1.0 (some
@@ -146,7 +146,7 @@ Premier League (**2.23**), where the points spread is more than twice what
 equal-strength teams would produce. The chaos does *not* wash out; it survives
 into the standings.
 
-![Title and relegation race decidedness by league](reports/figures/race_decidedness.png)
+![Title and relegation race decidedness by league](../reports/figures/race_decidedness.png)
 
 Race decidedness is the one place Brazil is *not* an outlier, and it is worth
 saying so plainly. Both races run late in every league — titles are typically
@@ -157,7 +157,7 @@ of matches to spare); the Brasileirão sits mid-pack on the title race
 strong cross-league differentiator here — a modest, honest result, not a
 headline.
 
-![Title concentration (Herfindahl index) with distinct-champion counts](reports/figures/title_concentration.png)
+![Title concentration (Herfindahl index) with distinct-champion counts](../reports/figures/title_concentration.png)
 
 The title-concentration chart is where the season-level story lands hardest.
 Over these fourteen years the Brasileirão was won by **seven different clubs**,
@@ -173,7 +173,7 @@ City's alone) is meaningfully more concentrated than Brazil.
 Put the two levels on one plane — match-level chaos across, season-level openness
 up — and the whole argument collapses into a single point.
 
-![Each league placed on match-level chaos (x) against season-level openness (y); the Brasileirão sits alone in the top-right corner](reports/figures/chaos_vs_openness.png)
+![Each league placed on match-level chaos (x) against season-level openness (y); the Brasileirão sits alone in the top-right corner](../reports/figures/chaos_vs_openness.png)
 
 The Brasileirão sits **alone in the chaotic-and-open corner**: the highest
 underdog points share *and* the most shared title of any of the six leagues.

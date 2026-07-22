@@ -56,52 +56,61 @@ def _clean(ax, t):
 
 
 # ---------------------------------------------------------------- Post 1
-# Home points share, 2015-2018 (CLAUDE.md / notebook 02): BRA 0.652, ESP 0.600, ENG 0.585
+# Home points share, matched window 2012-2025 (leagues.parquet, analysis.home_points_share):
+# BRA 0.6312, ESP 0.5956, FRA 0.5773, GER 0.5746, ENG 0.5703, ITA 0.5626.
+# Matched window = the fullest span all six leagues share.
 def home_advantage(theme="light", shape="45"):
     t = THEMES[theme]
-    data = [("Premier League", 0.585, False),
-            ("La Liga", 0.600, False),
-            ("Brasileirão", 0.652, True)]
+    order = [("Brasileirão", 0.631, True),
+             ("La Liga", 0.596, False),
+             ("Ligue 1", 0.577, False),
+             ("Bundesliga", 0.575, False),
+             ("Premier League", 0.570, False),
+             ("Serie A", 0.563, False)]
+    data = order[::-1]  # plot bottom-to-top so Brazil lands on top
 
     if shape == "45":
         fig = plt.figure(figsize=(5.4, 6.75), dpi=200)
-        _header(fig, t, "HOME ADVANTAGE  ·  BRASILEIRÃO STUDY",
+        _header(fig, t, "HOME ADVANTAGE  ·  SIX-LEAGUE STUDY",
                 "The strongest home advantage\nin world football is in Brazil",
-                "Home team's share of all points won, top divisions, 2015–2018.\n"
+                "Home team's share of all points won, top divisions, 2012–2025.\n"
                 "An even split would be 0.50.",
                 rule_y=0.945, eyebrow_y=0.912, head_y=0.86, head_size=20.5, dek_y=0.735)
-        ax = fig.add_axes([0.33, 0.205, 0.60, 0.40])
+        ax = fig.add_axes([0.33, 0.15, 0.60, 0.46])
         foot_y0 = 0.058
+        tick_sz, hero_sz, base_sz = 11, 13, 11
     else:  # 1:1 square
         fig = plt.figure(figsize=(5.4, 5.4), dpi=200)
-        _header(fig, t, "HOME ADVANTAGE  ·  BRASILEIRÃO STUDY",
+        _header(fig, t, "HOME ADVANTAGE  ·  SIX-LEAGUE STUDY",
                 "The strongest home advantage\nin world football is in Brazil",
-                "Home team's share of all points won,\ntop divisions, 2015–2018. Even split = 0.50.",
-                rule_y=0.935, eyebrow_y=0.895, head_y=0.835, head_size=18.5, dek_y=0.66)
-        ax = fig.add_axes([0.33, 0.16, 0.60, 0.36])
-        foot_y0 = 0.075
+                "Home team's share of all points won,\ntop divisions, 2012–2025. Even split = 0.50.",
+                rule_y=0.94, eyebrow_y=0.902, head_y=0.85, head_size=17, dek_y=0.69)
+        ax = fig.add_axes([0.33, 0.10, 0.60, 0.47])
+        foot_y0 = 0.055
+        tick_sz, hero_sz, base_sz = 10.5, 11.5, 10.5
     fig.patch.set_facecolor(t["surface"])
     _clean(ax, t)
 
-    ax.plot([0.50, 0.50], [-0.3, 2.3], color=t["ref"], lw=1.3, zorder=1)
-    for y, (name, val, hero) in enumerate(data):
+    ax.plot([0.50, 0.50], [-0.4, 5.4], color=t["ref"], lw=1.3, zorder=1)
+    for y, (nm, val, hero) in enumerate(data):
         c = t["accent"] if hero else t["muted"]
-        ax.plot([0.50, val], [y, y], color=c, lw=3.4, solid_capstyle="round", zorder=2)
-        ax.scatter(val, y, s=300 if hero else 235, color=c, zorder=3,
-                   edgecolor=t["surface"], linewidth=2.2)
-        ax.text(val + 0.006, y, f"{val:.3f}", va="center", ha="left", color=t["ink"],
-                fontsize=13 if hero else 11.5, fontweight="bold" if hero else "normal")
-    ax.set_xlim(0.49, 0.70)
-    ax.set_ylim(-0.7, 2.7)
+        ax.plot([0.50, val], [y, y], color=c, lw=3.2, solid_capstyle="round", zorder=2)
+        ax.scatter(val, y, s=290 if hero else 190, color=c, zorder=3,
+                   edgecolor=t["surface"], linewidth=2.0)
+        ax.text(val + 0.005, y, f"{val:.3f}", va="center", ha="left", color=t["ink"],
+                fontsize=hero_sz if hero else base_sz,
+                fontweight="bold" if hero else "normal")
+    ax.set_xlim(0.49, 0.68)
+    ax.set_ylim(-0.7, 5.7)
     ax.set_yticks(range(len(data)))
-    ax.set_yticklabels([d[0] for d in data], fontsize=11.5, color=t["ink2"])
+    ax.set_yticklabels([d[0] for d in data], fontsize=tick_sz, color=t["ink2"])
     for tick, d in zip(ax.get_yticklabels(), data):
         if d[2]:
             tick.set_color(t["ink"]); tick.set_fontweight("bold")
-    ax.text(0.50, -0.55, "0.50  ·  even split", ha="center", va="top",
+    ax.text(0.50, -0.62, "0.50  ·  even split", ha="center", va="top",
             color=t["ink3"], fontsize=9.5)
 
-    _footer(fig, t, ["Data: top-division league match results, 2015–2018   ·   Chart: Gustavo Bohn",
+    _footer(fig, t, ["Data: top-division league match results, 2012–2025 (six leagues)   ·   Chart: Gustavo Bohn",
                      "Points share = points won at home ÷ all points on offer"], y0=foot_y0)
     name = f"post1_home_advantage_{'square' if shape=='11' else theme}"
     fig.savefig(OUT / f"{name}.png", facecolor=t["surface"])

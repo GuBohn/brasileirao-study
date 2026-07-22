@@ -46,11 +46,11 @@ What's a number in your field that everyone rounds off and shouldn't?
 
 ### Recommended (bonus-stat version — rewards the reader who clicks into comments)
 
-One more number that didn't fit above: even during the closed-door COVID window, with empty stadiums, the home points share only fell from 0.634 to 0.582. Crowd is part of it, not all of it. Full breakdown, charts and code: [PASTE PUBLIC LINK HERE]
+One more number that didn't fit above: even during the closed-door COVID window, with empty stadiums, the home points share only fell from 0.634 to 0.582. Crowd is part of it, not all of it. Full breakdown, charts and code: https://github.com/GuBohn/brasileirao-study
 
 ### Alternate (plain value version)
 
-If you want the how, not just the number: the write-up walks through the crowd, travel and heat decomposition, the model, and where each effect shows up (and where it vanishes). Charts and code included: [PASTE PUBLIC LINK HERE]
+If you want the how, not just the number: the write-up walks through the crowd, travel and heat decomposition, the model, and where each effect shows up (and where it vanishes). Charts and code included: https://github.com/GuBohn/brasileirao-study
 
 ---
 

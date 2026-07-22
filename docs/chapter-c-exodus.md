@@ -26,7 +26,7 @@ An earlier version of this analysis used an open Transfermarkt data dump and
 found only ~64 mid-season departures across twelve seasons — suspiciously few. The
 dump, it turned out, is biased toward a recent player universe and silently
 undercounts history: it was missing most of the stars above. So this version goes
-to the source. Match results and pre-match [causal Elo](README.md) come from the
+to the source. Match results and pre-match [causal Elo](chapter-a-home-advantage.md) come from the
 project's clean Brasileirão history (2003–2024); the **departures** come from
 scraping Transfermarkt's per-club-season transfer pages directly — rate-limited,
 cached to disk, and filtered to the **summer window** (which lands mid-Brazilian

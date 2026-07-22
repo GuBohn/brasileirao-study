@@ -6,3 +6,5 @@ __pycache__/
 data/raw/
 data/processed/
 *.egg-info/
+# Internal specs/plans — kept locally, never published
+docs/superpowers/

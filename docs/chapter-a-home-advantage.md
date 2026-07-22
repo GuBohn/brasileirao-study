@@ -316,9 +316,7 @@ sequence against a freshly deleted `data/processed/` directory.
 
 ## Roadmap
 
-This is Chapter A of a planned three-chapter anthology; the full design
-lives in
-[`docs/superpowers/specs/2026-07-19-brasileirao-home-advantage-design.md`](superpowers/specs/2026-07-19-brasileirao-home-advantage-design.md).
+This is Chapter A of a planned three-chapter anthology.
 
 - **[Chapter B — cross-league unpredictability](chapter-b-unpredictability.md).**
   How competitively balanced is the Brasileirão compared with Europe's big

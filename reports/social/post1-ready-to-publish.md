@@ -13,6 +13,8 @@ Example URL shape: `https://github.com/<your-username>/data-football`
 
 ## 1) THE POST (paste into the post box)
 
+The World Cup just ended. So I ran the numbers on the football in my own country.
+
 Home teams in the Brasileirão take 63.1% of all points on offer.
 
 Not 63%. 0.631, across 5,319 matches from 2012 to 2025. I counted every one.
@@ -26,9 +28,9 @@ I went looking for the strongest home advantage in world football. Here is the l
 - Premier League: 0.570
 - Serie A: 0.563
 
-That gap looks small. It isn't. Over a 38-game season it's the difference between a Champions League spot and mid-table.
+That gap looks small. It isn't. Over a 38-game season it's the difference between a Champions League or Copa Libertadores spot and mid-table.
 
-What surprised me: the usual suspects don't explain it. I built features for travel distance, altitude, heat, days of rest. Then I tested whether any of them predict a single match better than a plain Elo rating.
+What surprised me: the usual suspects don't explain it. I built features for travel distance, crowd, heat, days of rest. Then I tested whether any of them predict a single match better than a plain Elo rating.
 
 They don't. The home edge is enormous in the season table.. and almost invisible match to match, because the rating already knows.
 

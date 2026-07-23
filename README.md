@@ -10,10 +10,10 @@ notebooks.
 ## The chapters
 
 - **[Chapter A — Anatomy of the World's Strongest Home Advantage](docs/chapter-a-home-advantage.md)**
-  How big is the Brasileirão's home advantage (points share **0.652**, above La
-  Liga and the Premier League), and what actually causes it? Decomposes crowd,
-  travel, and heat using a COVID natural experiment and a SHAP-explained outcome
-  model. *Verdict: the effects are real in aggregate points share, not in
+  How big is the Brasileirão's home advantage (points share **0.631** over the
+  matched 2012–2025 window — the highest of Europe's big five plus Brazil), and
+  what actually causes it? Decomposes crowd, travel, and heat using a COVID
+  natural experiment and a SHAP-explained outcome model. *Verdict: the effects are real in aggregate points share, not in
   per-match prediction — Elo already captures nearly everything forecastable
   about a single match.*
 

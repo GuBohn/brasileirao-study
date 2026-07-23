@@ -19,14 +19,19 @@ advantage, tests three candidate causes — crowd support, travel distance,
 and climate — and reports plainly which ones hold up and which don't.
 
 The hook that made this worth investigating in the first place: measured
-against two of the best-supported leagues on the planet, using the identical
-metric over the identical 2015–2018 window, Brazilian home teams collected
-**0.652** of every league point up for grabs — a "points share," the fraction
-of all points actually awarded in a set of matches that went to the home
-side, explained fully below — compared with **0.600** in Spain's La Liga and
-**0.585** in England's Premier League.
+against Europe's "big five" leagues — the Premier League, La Liga, Serie A, the
+Bundesliga, and Ligue 1 — using the identical metric over the identical
+2012–2025 window and the identical data source, Brazilian home teams collected
+**0.631** of every league point up for grabs — a "points share," the fraction
+of all points actually awarded in a set of matches that went to the home side,
+explained fully below. That is the highest of the six, and comfortably so: next
+comes La Liga at **0.596**, then Ligue 1 (**0.577**), the Bundesliga
+(**0.575**), the Premier League (**0.570**), and Serie A (**0.563**). Brazil's
+95% confidence interval clears the second-placed league's without overlapping,
+so its lead — the strongest home advantage of Europe's big five plus Brazil — is
+real, not a rounding accident.
 
-![Home advantage 2015–2018: Brasileirão vs Premier League and La Liga, using the same home-points-share metric](../reports/figures/cross_league_home_advantage.png)
+![Home advantage across six leagues over the matched 2012–2025 window: the Brasileirão versus Europe's big five, using the same home-points-share metric with 95% bootstrap confidence intervals](../reports/figures/cross_league_home_advantage.png)
 
 **Methods at a glance:** this project demonstrates causal (pre-match-only)
 Elo ratings, bootstrap confidence intervals, a natural-experiment /
@@ -48,7 +53,12 @@ splits only two points between two teams instead of handing three to a
 winner, this share sits well above the raw "home win rate" most fans have in
 their head (49.6% of matches are home wins, 26.4% draws, 23.9% away wins) —
 the accounting itself pulls the number upward before home advantage even
-enters the picture.
+enters the picture. (One sourcing note so two numbers don't look like a
+contradiction: the cross-league bar above puts Brazil at 0.631 using the common
+football-data.co.uk source over the matched 2012–2025 window, for a fair
+comparison against Europe; the 0.6407 here comes from the fuller Brazilian
+dataset — the `adaoduque` results, 2003–2024 — which the rest of this deep dive
+uses throughout. Same metric, different window and source, named on purpose.)
 
 ![Brasileirão home points share by season, 2003–2024, with a 95% bootstrap confidence interval band](../reports/figures/home_points_share.png)
 
@@ -287,8 +297,9 @@ Data sources, downloaded automatically on first run and cached under
 - **Match results** — the `adaoduque/Brasileirao_Dataset` GitHub repository
   (full Brasileirão history, 2003–present).
 - **European league results** — season-by-season CSVs from
-  [football-data.co.uk](https://www.football-data.co.uk/) (Premier League
-  `E0`, La Liga `SP1`).
+  [football-data.co.uk](https://www.football-data.co.uk/) for Europe's big five
+  (Premier League `E0`, La Liga `SP1`, Serie A `I1`, Bundesliga `D1`, Ligue 1
+  `F1`), over the matched 2012–2025 window used for the cross-league hook.
 - **Bookmaker odds** — Pinnacle closing odds from football-data.co.uk's
   `BRA.csv`.
 

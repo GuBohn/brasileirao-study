@@ -8,3 +8,5 @@ data/processed/
 *.egg-info/
 # Internal specs/plans — kept locally, never published
 docs/superpowers/
+# Social-media working files — kept locally, never published
+reports/social/
